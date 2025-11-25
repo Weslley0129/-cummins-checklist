@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUMMINS - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(to bottom right, #f8fafc, #e2e8f0);
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            background: white;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: #F7323F;
+            background: #fef2f2;
+        }
+
+        .nav-link.active {
+            color: #F7323F;
+            background: #fee2e2;
+            border-color: #F7323F;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 48px;
+            height: 48px;
+            background: #F7323F;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(247, 50, 63, 0.3);
+        }
+
+        .logo span {
+            color: white;
+            font-weight: 900;
+            font-size: 24px;
+        }
+
+        .header-text h1 {
+            font-size: 32px;
+            font-weight: 900;
+            color: #0f172a;
+            letter-spacing: -1px;
+        }
+
+        .header-text p {
+            color: #475569;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: #F7323F;
+            color: white;
+            box-shadow: 0 4px 12px rgba(247, 50, 63, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #D91E2A;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(247, 50, 63, 0.4);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-top: 4px solid;
+        }
+
+        .stat-card.red {
+            border-top-color: #F7323F;
+        }
+
+        .stat-card.orange {
+            border-top-color: #f97316;
+        }
+
+        .stat-card.green {
+            border-top-color: #22c55e;
+        }
+
+        .stat-card.slate {
+            border-top-color: #475569;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .stat-icon.red {
+            background: #fee2e2;
+            color: #F7323F;
+        }
+
+        .stat-icon.orange {
+            background: #fff7ed;
+            color: #f97316;
+        }
+
+        .stat-icon.green {
+            background: #dcfce7;
+            color: #22c55e;
+        }
+
+        .stat-icon.slate {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 900;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .stat-trend {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            background: linear-gradient(to right, #fef2f2, #fff7ed);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .card-content {
+            padding: 24px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+        }
+
+        .pareto-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .pareto-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .pareto-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pareto-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .pareto-count {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .pareto-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .pareto-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .pareto-fill.red {
+            background: #F7323F;
+        }
+
+        .pareto-fill.orange {
+            background: #f97316;
+        }
+
+        .pareto-fill.amber {
+            background: #f59e0b;
+        }
+
+        .pareto-fill.slate {
+            background: #64748b;
+        }
+
+        .pareto-percentage {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .alerts-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .alerts-table thead {
+            background: #f8fafc;
+        }
+
+        .alerts-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .alerts-table td {
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #0f172a;
+        }
+
+        .alerts-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #22c55e;
+            color: white;
+        }
+
+        .badge-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .badge-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .badge-critical {
+            background: #dc2626;
+            color: white;
+        }
+
+        .empty-state {
+            padding: 48px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-state-subtext {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Menu -->
+        <div class="nav-menu">
+            <a href="cummins-dashboard.html" class="nav-link active">📊 Dashboard</a>
+            <a href="cummins-checklist.html" class="nav-link">📝 Checklist</a>
+            <a href="cummins-admin.html" class="nav-link">⚙️ Admin</a>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="header-top">
+                <div class="header-left">
+                    <div class="logo">
+                        <span>C</span>
+                    </div>
+                    <div class="header-text">
+                        <h1>CUMMINS</h1>
+                        <p>Dashboard de Segurança</p>
+                    </div>
+                </div>
+                <a href="cummins-checklist.html" class="btn btn-primary">
+                    <span>➕</span>
+                    <span>Novo Checklist</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card red">
+                <div class="stat-header">
+                    <div class="stat-title">Total de Checklists</div>
+                    <div class="stat-icon red">📋</div>
+                </div>
+                <div class="stat-value" id="totalChecklists">0</div>
+                <div class="stat-trend" id="todayChecklists">0 hoje</div>
+            </div>
+
+            <div class="stat-card orange">
+                <div class="stat-header">
+                    <div class="stat-title">Alertas Gerados</div>
+                    <div class="stat-icon orange">⚠️</div>
+                </div>
+                <div class="stat-value" id="totalAlerts">0</div>
+                <div class="stat-trend" id="alertsPercentage">0% do total</div>
+            </div>
+
+            <div class="stat-card green">
+                <div class="stat-header">
+                    <div class="stat-title">Checklists Conformes</div>
+                    <div class="stat-icon green">✅</div>
+                </div>
+                <div class="stat-value" id="totalConformes">0</div>
+                <div class="stat-trend" id="conformePercentage">0% de conformidade</div>
+            </div>
+
+            <div class="stat-card slate">
+                <div class="stat-header">
+                    <div class="stat-title">Taxa de Melhoria</div>
+                    <div class="stat-icon slate">📈</div>
+                </div>
+                <div class="stat-value" id="taxaMelhoria">0%</div>
+                <div class="stat-trend">Meta: 95%</div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+            <!-- Pareto Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span>📊</span>
+                        <span>Gráfico de Pareto - Problemas Mais Frequentes</span>
+                    </div>
+                    <div class="card-subtitle">
+                        Identifique os problemas prioritários para ações de melhoria contínua
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="chart-container">
+                        <canvas id="paretoChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pareto Summary -->
+            <div class="card">
+                <div class="card-header" style="background: #f8fafc;">
+                    <div class="card-title">
+                        <span>📋</span>
+                        <span>Resumo do Pareto</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="pareto-summary" id="paretoSummary">
+                        <div class="empty-state">
+                            <div class="empty-state-text">Sem dados para exibir</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts Table -->
+        <div class="card">
+            <div class="card-header" style="background: #fef2f2;">
+                <div class="card-title">
+                    <span>⚠️</span>
+                    <span>Log de Alertas Recentes</span>
+                </div>
+                <div class="card-subtitle">
+                    Histórico completo para auditoria e acompanhamento de resolução
+                </div>
+            </div>
+            <div class="card-content" style="padding: 0;">
+                <div style="overflow-x: auto;">
+                    <table class="alerts-table">
+                        <thead>
+                            <tr>
+                                <th>Data/Hora</th>
+                                <th>Operador</th>
+                                <th>Doca</th>
+                                <th>Veículo</th>
+                                <th>Problemas</th>
+                                <th>Nível Risco</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alertsTableBody">
+                            <tr>
+                                <td colspan="6" class="empty-state">Carregando dados...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados globais
+        let allChecklists = [];
+        let paretoChart;
+
+        // Mapeamento de perguntas
+        const questionMap = {
+            "q1_altura_material_acima_limite": "Altura acima do limite",
+            "q2_acondicionamento_inadequado": "Acondicionamento inadequado",
+            "q3_material_com_avaria": "Material com avaria",
+            "q4_material_sem_arquivamento": "Sem arquivamento",
+            "q5_veiculo_sem_calco": "Veículo sem calço",
+            "q6_buracos_no_piso": "Buracos no piso",
+            "q7_guia_garfo_fora_posicionamento": "Guia garfo fora posição",
+            "q8_area_manobra_obstruida": "Área de manobra obstruída"
+        };
+
+        // Carregar dados
+        function loadData() {
+            // ============================================
+            // INTEGRAÇÃO COM BACKEND
+            // ============================================
+            const BACKEND_URL = null; // Exemplo: 'http://localhost:5000/api/checklists'
+            
+            if (BACKEND_URL) {
+                fetch(BACKEND_URL)
+                    .then(res => res.json())
+                    .then(data => {
+                        allChecklists = data;
+                        updateDashboard();
+                    })
+                    .catch(err => {
+                        console.error('Erro ao carregar checklists:', err);
+                        loadFromLocalStorage();
+                    });
+            } else {
+                loadFromLocalStorage();
+            }
+        }
+
+        // Carregar do localStorage
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('cummins_checklists');
+            if (saved) {
+                try {
+                    allChecklists = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Erro ao carregar checklists salvos');
+                    allChecklists = [];
+                }
+            }
+            updateDashboard();
+        }
+
+        // Atualizar dashboard
+        function updateDashboard() {
+            updateStats();
+            updateParetoChart();
+            updateAlertsTable();
+        }
+
+        // Atualizar estatísticas
+        function updateStats() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const todayChecklists = allChecklists.filter(c => {
+                const checklistDate = c.data_envio || c.created_date || new Date().toISOString();
+                const date = new Date(checklistDate);
+                date.setHours(0, 0, 0, 0);
+                return date.getTime() === today.getTime();
+            });
+
+            const alertsCount = allChecklists.filter(c => c.status_checklist === "Alerta Gerado").length;
+            const conformeCount = allChecklists.filter(c => c.status_checklist === "Conforme").length;
+            const total = allChecklists.length;
+            const conformePercentage = total > 0 ? ((conformeCount / total) * 100).toFixed(1) : 0;
+            const alertsPercentage = total > 0 ? ((alertsCount / total) * 100).toFixed(1) : 0;
+
+            document.getElementById('totalChecklists').textContent = total;
+            document.getElementById('todayChecklists').textContent = `${todayChecklists.length} hoje`;
+            document.getElementById('totalAlerts').textContent = alertsCount;
+            document.getElementById('alertsPercentage').textContent = `${alertsPercentage}% do total`;
+            document.getElementById('totalConformes').textContent = conformeCount;
+            document.getElementById('conformePercentage').textContent = `${conformePercentage}% de conformidade`;
+            document.getElementById('taxaMelhoria').textContent = `${conformePercentage}%`;
+        }
+
+        // Calcular dados do Pareto
+        function calculateParetoData() {
+            const problemCounts = {};
+            
+            Object.values(questionMap).forEach(label => {
+                problemCounts[label] = 0;
+            });
+
+            allChecklists.forEach(checklist => {
+                Object.entries(questionMap).forEach(([key, label]) => {
+                    if (checklist[key]) {
+                        problemCounts[label]++;
+                    }
+                });
+            });
+
+            const total = Object.values(problemCounts).reduce((sum, count) => sum + count, 0);
+
+            return Object.entries(problemCounts)
+                .map(([name, count]) => ({
+                    name,
+                    count,
+                    percentage: total > 0 ? parseFloat(((count / total) * 100).toFixed(1)) : 0
+                }))
+                .sort((a, b) => b.count - a.count)
+                .filter(item => item.count > 0);
+        }
+
+        // Atualizar gráfico de Pareto
+        function updateParetoChart() {
+            const paretoData = calculateParetoData();
+            const ctx = document.getElementById('paretoChart').getContext('2d');
+
+            if (paretoChart) {
+                paretoChart.destroy();
+            }
+
+            if (paretoData.length === 0) {
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '16px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Nenhum problema registrado!', ctx.canvas.width / 2, ctx.canvas.height / 2 - 20);
+                ctx.fillText('Todos os checklists estão conformes.', ctx.canvas.width / 2, ctx.canvas.height / 2 + 10);
+                document.getElementById('paretoSummary').innerHTML = '<div class="empty-state"><div class="empty-state-text">Sem dados para exibir</div></div>';
+                return;
+            }
+
+            const colors = ['#F7323F', '#f97316', '#f59e0b', '#64748b', '#94a3b8'];
+
+            paretoChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: paretoData.map(d => d.name),
+                    datasets: [{
+                        label: 'Ocorrências',
+                        data: paretoData.map(d => d.count),
+                        backgroundColor: paretoData.map((_, i) => colors[i] || colors[colors.length - 1]),
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    const dataIndex = context.dataIndex;
+                                    return `Percentual: ${paretoData[dataIndex].percentage}%`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Atualizar resumo
+            const summaryHtml = paretoData.slice(0, 5).map((item, index) => {
+                const colorClass = index === 0 ? 'red' : index === 1 ? 'orange' : index === 2 ? 'amber' : 'slate';
+                return `
+                    <div class="pareto-item">
+                        <div class="pareto-header">
+                            <span class="pareto-name">${item.name}</span>
+                            <span class="pareto-count">${item.count}</span>
+                        </div>
+                        <div class="pareto-bar">
+                            <div class="pareto-fill ${colorClass}" style="width: ${item.percentage}%"></div>
+                        </div>
+                        <div class="pareto-percentage">${item.percentage}% do total</div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('paretoSummary').innerHTML = summaryHtml;
+        }
+
+        // Atualizar tabela de alertas
+        function updateAlertsTable() {
+            const recentAlerts = allChecklists
+                .filter(c => c.status_checklist === "Alerta Gerado")
+                .slice(0, 10)
+                .sort((a, b) => {
+                    const dateA = new Date(a.data_envio || a.created_date || 0);
+                    const dateB = new Date(b.data_envio || b.created_date || 0);
+                    return dateB - dateA;
+                });
+
+            const tbody = document.getElementById('alertsTableBody');
+
+            if (recentAlerts.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <div class="empty-state-icon">✅</div>
+                            <div class="empty-state-text">Nenhum alerta registrado!</div>
+                            <div class="empty-state-subtext">Todos os checklists estão conformes.</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = recentAlerts.map(checklist => {
+                const dataFormatada = checklist.data_envio || checklist.created_date || new Date().toISOString();
+                const data = new Date(dataFormatada).toLocaleString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const problemas = checklist.problemas_identificados || [];
+                const problemasTexto = problemas.length > 0 
+                    ? problemas.slice(0, 2).join(', ') + (problemas.length > 2 ? '...' : '')
+                    : 'Nenhum';
+
+                const riscoBadge = getRiscoBadge(checklist.nivel_risco || 'Baixo');
+
+                return `
+                    <tr>
+                        <td>${data}</td>
+                        <td>${checklist.nome_operador || '-'}</td>
+                        <td>${checklist.doca_numero || '-'}</td>
+                        <td>${checklist.tipo_veiculo || '-'} ${checklist.placa_veiculo || ''}</td>
+                        <td>${problemasTexto}</td>
+                        <td>${riscoBadge}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Badge de risco
+        function getRiscoBadge(nivel) {
+            const badges = {
+                'Baixo': '<span class="badge badge-success">Baixo</span>',
+                'Médio': '<span class="badge badge-warning">Médio</span>',
+                'Alto': '<span class="badge badge-danger">Alto</span>',
+                'Crítico': '<span class="badge badge-critical">Crítico</span>'
+            };
+            return badges[nivel] || badges['Baixo'];
+        }
+
+        // Inicializar quando a página carregar
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData();
+        });
+
+        // Escutar evento customizado quando um checklist for salvo
+        window.addEventListener('checklistSalvo', (e) => {
+            loadFromLocalStorage();
+            updateDashboard();
+        });
+
+        // Atualizar quando houver mudanças no storage (de outras abas)
+        window.addEventListener('storage', () => {
+            loadFromLocalStorage();
+            updateDashboard();
+        });
+
+        // Atualizar periodicamente (a cada 2 segundos) para detectar novos checklists
+        setInterval(() => {
+            const currentCount = allChecklists.length;
+            loadFromLocalStorage();
+            if (allChecklists.length !== currentCount) {
+                updateDashboard();
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

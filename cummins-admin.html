@@ -1,0 +1,2422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUMMINS ADMIN - Gestão de Checklists</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Sistema de Banco de Dados -->
+    <script src="database.js"></script>
+    <script src="backend_helper.js"></script>
+    <!-- Sistema de Notificações -->
+    <script src="notificacoes.js"></script>
+    <!-- Teclado Virtual -->
+    <script src="teclado_virtual.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(to bottom right, #f8fafc, #e2e8f0);
+            min-height: 100vh;
+            padding: 16px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-link {
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            background: white;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .nav-link:hover {
+            color: #F7323F;
+            background: #fef2f2;
+        }
+        
+        .nav-link.active {
+            color: #F7323F;
+            background: #fee2e2;
+            border-color: #F7323F;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .logo {
+            width: 56px;
+            height: 56px;
+            background: #F7323F;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(247, 50, 63, 0.3);
+        }
+        
+        .logo span {
+            color: white;
+            font-weight: 900;
+            font-size: 24px;
+        }
+        
+        .header-text h1 {
+            font-size: 32px;
+            font-weight: 900;
+            color: #0f172a;
+            letter-spacing: -1px;
+        }
+        
+        .header-text p {
+            color: #475569;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .tabs {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        
+        .tabs-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background: white;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .tab-trigger {
+            padding: 16px 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab-trigger:hover {
+            background: #f8fafc;
+            color: #0f172a;
+        }
+        
+        .tab-trigger.active {
+            background: #F7323F;
+            color: white;
+            border-bottom-color: #F7323F;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 24px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background: #f8fafc;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .card-header.border-red {
+            border-top: 4px solid #F7323F;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .card-content {
+            padding: 24px;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        
+        input,
+        select {
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #F7323F;
+        }
+        
+        .search-input {
+            position: relative;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .search-input input {
+            padding-left: 36px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: #F7323F;
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: #D91E2A;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(247, 50, 63, 0.3);
+        }
+        
+        .btn-success {
+            background: #22c55e;
+            color: white;
+        }
+        
+        .btn-success:hover:not(:disabled) {
+            background: #16a34a;
+        }
+        
+        .btn-outline {
+            background: white;
+            color: #0f172a;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .btn-outline:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: #f8fafc;
+        }
+        
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #0f172a;
+        }
+        
+        tr:hover {
+            background: #f8fafc;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #22c55e !important;
+            color: white !important;
+        }
+        
+        .badge-danger {
+            background: #ef4444 !important;
+            color: white !important;
+        }
+        
+        .badge-warning {
+            background: #f59e0b !important;
+            color: white !important;
+        }
+        
+        .badge-critical {
+            background: #dc2626 !important;
+            color: white !important;
+        }
+        
+        .badge-low {
+            background: #22c55e !important;
+            color: white !important;
+        }
+        
+        .empty-state {
+            padding: 48px;
+            text-align: center;
+            color: #64748b;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 900;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+        
+        #riscoCritico {
+            color: #ef4444 !important;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 24px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748b;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+        
+        .close-btn:hover {
+            background: #f8fafc;
+            color: #0f172a;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .detail-value {
+            font-size: 14px;
+            color: #0f172a;
+            font-weight: 500;
+        }
+        
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .photo-item {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .message-item {
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .message-item:hover {
+            background: #f8fafc;
+        }
+        
+        .message-item.unread {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 8px;
+        }
+        
+        .message-sender {
+            font-weight: 600;
+            color: #0f172a;
+        }
+        
+        .message-date {
+            font-size: 12px;
+            color: #64748b;
+        }
+        
+        .message-content {
+            color: #475569;
+            font-size: 14px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 48px;
+            color: #64748b;
+        }
+        /* Chat Styles */
+        
+        .chat-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            height: calc(100vh - 300px);
+            min-height: 600px;
+        }
+        
+        .chat-sidebar {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-sidebar-header {
+            padding: 20px;
+            border-bottom: 2px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-sidebar-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        
+        .btn-icon {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .btn-icon:hover {
+            background: #f1f5f9;
+        }
+        
+        .chat-search {
+            padding: 16px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        
+        .chat-search input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .chat-search input:focus {
+            outline: none;
+            border-color: #F7323F;
+        }
+        
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+        
+        .chat-item {
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .chat-item:hover {
+            background: #f8fafc;
+        }
+        
+        .chat-item.active {
+            background: #fef2f2;
+            border-color: #F7323F;
+        }
+        
+        .chat-item.unread {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .chat-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 8px;
+        }
+        
+        .chat-item-name {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 15px;
+        }
+        
+        .chat-item-time {
+            font-size: 12px;
+            color: #64748b;
+        }
+        
+        .chat-item-preview {
+            font-size: 13px;
+            color: #64748b;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .chat-item-badge {
+            background: #F7323F;
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+        
+        .chat-main {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-empty {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        
+        .chat-empty h3 {
+            font-size: 20px;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+        
+        .chat-empty p {
+            color: #64748b;
+            font-size: 14px;
+        }
+        
+        .chat-active {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .chat-header {
+            padding: 20px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        
+        .chat-user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .chat-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #F7323F 0%, #D91E2A 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            font-weight: 700;
+        }
+        
+        .chat-user-name {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 16px;
+        }
+        
+        .chat-user-email {
+            font-size: 13px;
+            color: #64748b;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: #f8fafc;
+        }
+        
+        .chat-message {
+            display: flex;
+            gap: 12px;
+            max-width: 70%;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .chat-message.admin {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        
+        .chat-message.operator {
+            align-self: flex-start;
+        }
+        
+        .chat-message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .chat-message.admin .chat-message-avatar {
+            background: linear-gradient(135deg, #F7323F 0%, #D91E2A 100%);
+            color: white;
+        }
+        
+        .chat-message.operator .chat-message-avatar {
+            background: #e2e8f0;
+            color: #64748b;
+        }
+        
+        .chat-message-content {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chat-message.admin .chat-message-content {
+            background: linear-gradient(135deg, #F7323F 0%, #D91E2A 100%);
+            color: white;
+        }
+        
+        .chat-message-text {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 4px;
+        }
+        
+        .chat-message-time {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+        
+        .chat-input-area {
+            padding: 20px;
+            border-top: 2px solid #f1f5f9;
+        }
+        
+        .chat-input-area textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: none;
+            margin-bottom: 12px;
+        }
+        
+        .chat-input-area textarea:focus {
+            outline: none;
+            border-color: #F7323F;
+        }
+        
+        .chat-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .badge {
+            background: #F7323F;
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .chat-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            .chat-sidebar {
+                max-height: 300px;
+            }
+            .tabs-list {
+                grid-template-columns: 1fr;
+            }
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Navigation Menu -->
+        <div class="nav-menu">
+            <a href="cummins-dashboard.html" class="nav-link">📊 Dashboard</a>
+            <a href="cummins-checklist.html" class="nav-link">📝 Checklist</a>
+            <a href="cummins-admin.html" class="nav-link active">⚙️ Admin</a>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <span>C</span>
+            </div>
+            <div class="header-text">
+                <h1>CUMMINS ADMIN</h1>
+                <p>Gestão de Checklists de Segurança</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tabs-list">
+                <button class="tab-trigger active" data-tab="registros">
+                    <span>📋</span>
+                    <span>Registros</span>
+                </button>
+                <button class="tab-trigger" data-tab="risco">
+                    <span>📊</span>
+                    <span>Avaliação de Risco</span>
+                </button>
+                <button class="tab-trigger" data-tab="mensagens">
+                    <span>💬</span>
+                    <span>Mensagens</span>
+                </button>
+                <button class="tab-trigger" data-tab="chat">
+                    <span>💬</span>
+                    <span>Chat</span>
+                    <span class="badge" id="chatBadge" style="display: none;">0</span>
+                </button>
+            </div>
+
+            <!-- Tab: Registros -->
+            <div id="tab-registros" class="tab-content active">
+                <div class="card border-red">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>🔍</span>
+                            <span>Filtros e Exportação</span>
+                        </div>
+                        <button class="btn btn-success" id="exportBtn" onclick="exportToExcel()">
+                            <span>📥</span>
+                            <span>Exportar Excel (<span id="exportCount">0</span>)</span>
+                        </button>
+                    </div>
+                    <div class="card-content">
+                        <div class="filters-grid">
+                            <div class="form-group">
+                                <label>Buscar</label>
+                                <div class="search-input">
+                                    <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                    <input type="text" id="searchInput" placeholder="Operador, doca, placa..." oninput="filterChecklists()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select id="statusFilter" onchange="filterChecklists()">
+                                    <option value="todos">Todos</option>
+                                    <option value="Conforme">Conforme</option>
+                                    <option value="Alerta Gerado">Alerta Gerado</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Data da Operação</label>
+                                <input type="date" id="dateFilter" onchange="filterChecklists()">
+                            </div>
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <button class="btn btn-outline" onclick="clearFilters()">Limpar Filtros</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>📋</span>
+                            <span>Registros de Checklists</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="text-align: right;">
+                                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Total de Checklists</div>
+                                <div style="font-size: 24px; font-weight: 900; color: #0f172a;" id="totalRecordsCount">0</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Filtrados</div>
+                                <div style="font-size: 24px; font-weight: 900; color: #0f172a;" id="recordsCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Data/Hora</th>
+                                        <th>Horário Início</th>
+                                        <th>Operador</th>
+                                        <th>Doca</th>
+                                        <th>Tipo Veículo</th>
+                                        <th>Placa</th>
+                                        <th>Status</th>
+                                        <th>Nível Risco</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="checklistsTableBody">
+                                    <tr>
+                                        <td colspan="9" class="empty-state">Carregando dados...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Risco -->
+            <div id="tab-risco" class="tab-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalChecklists">0</div>
+                        <div class="stat-label">Total de Checklists</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalAlertas">0</div>
+                        <div class="stat-label">Alertas Gerados</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalConformes">0</div>
+                        <div class="stat-label">Conformes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="riscoCritico">0</div>
+                        <div class="stat-label">Risco Crítico</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>📊</span>
+                            <span>Distribuição por Nível de Risco</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="chart-container">
+                            <canvas id="riskChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>📈</span>
+                            <span>Alertas por Dia</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="chart-container">
+                            <canvas id="alertsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>🚛</span>
+                            <span>Problemas Mais Frequentes</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="chart-container">
+                            <canvas id="problemsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Mensagens -->
+            <div id="tab-mensagens" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>💬</span>
+                            <span>Mensagens dos Operadores (<span id="messagesCount">0</span>)</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div id="messagesList">
+                            <div class="empty-state">Carregando mensagens...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Chat -->
+            <div id="tab-chat" class="tab-content">
+                <div class="chat-container">
+                    <!-- Lista de Conversas -->
+                    <div class="chat-sidebar">
+                        <div class="chat-sidebar-header">
+                            <h3>Conversas</h3>
+                            <button class="btn-icon" onclick="refreshChats()" title="Atualizar">🔄</button>
+                        </div>
+                        <div class="chat-search">
+                            <input type="text" id="chatSearch" placeholder="Buscar operador..." oninput="filterChats()">
+                        </div>
+                        <div class="chat-list" id="chatList">
+                            <div class="empty-state">Carregando conversas...</div>
+                        </div>
+                    </div>
+
+                    <!-- Área de Mensagens -->
+                    <div class="chat-main">
+                        <div id="chatEmpty" class="chat-empty">
+                            <div class="empty-icon">💬</div>
+                            <h3>Selecione uma conversa</h3>
+                            <p>Escolha um operador na lista ao lado para iniciar o bate-papo</p>
+                        </div>
+
+                        <div id="chatActive" class="chat-active" style="display: none;">
+                            <div class="chat-header">
+                                <div class="chat-user-info">
+                                    <div class="chat-avatar" id="chatAvatar">👤</div>
+                                    <div>
+                                        <div class="chat-user-name" id="chatUserName">Operador</div>
+                                        <div class="chat-user-email" id="chatUserEmail">email@cummins.com</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="chat-messages" id="chatMessages">
+                                <!-- Mensagens serão inseridas aqui -->
+                            </div>
+
+                            <div class="chat-input-area">
+                                <textarea id="chatMessageInput" placeholder="Digite sua mensagem..." rows="3" onkeydown="handleChatKeyDown(event)"></textarea>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                                    <button onclick="toggleTecladoVirtualAdmin('chatMessageInput')" style="padding: 8px 16px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 12px; font-weight: 600; color: #64748b; cursor: pointer;">
+                                        ⌨️ Teclado Virtual
+                                    </button>
+                                    <div class="chat-actions">
+                                        <button class="btn btn-success" onclick="sendChatMessage()">
+                                            <span>📤</span>
+                                            <span>Enviar</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalhes -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Detalhes do Checklist</h3>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // Dados globais
+        let allChecklists = [];
+        let filteredChecklists = [];
+        let allMessages = [];
+        let riskChart, alertsChart, problemsChart;
+
+        // Perguntas do checklist
+        const questions = [{
+            key: "q1_altura_material_acima_limite",
+            label: "Altura do material acima do limite?"
+        }, {
+            key: "q2_acondicionamento_inadequado",
+            label: "Acondicionamento inadequado/inseguro?"
+        }, {
+            key: "q3_material_com_avaria",
+            label: "Material com avaria visível?"
+        }, {
+            key: "q4_material_sem_arquivamento",
+            label: "Material sem arquivamento?"
+        }, {
+            key: "q5_veiculo_sem_calco",
+            label: "Veículo sem calço?"
+        }, {
+            key: "q6_buracos_no_piso",
+            label: "Buracos no piso?"
+        }, {
+            key: "q7_guia_garfo_fora_posicionamento",
+            label: "Guia garfo fora de posição?"
+        }, {
+            key: "q8_area_manobra_obstruida",
+            label: "Área de manobra obstruída?"
+        }];
+
+        // Inicialização
+        function init() {
+            setupTabs();
+            loadData();
+            setupCharts();
+        }
+
+        // Configurar tabs
+        function setupTabs() {
+            document.querySelectorAll('.tab-trigger').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.dataset.tab;
+
+                    // Atualizar botões
+                    document.querySelectorAll('.tab-trigger').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    // Atualizar conteúdo
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    document.getElementById(`tab-${tab}`).classList.add('active');
+
+                    // Atualizar dados quando mudar de tab
+                    if (tab === 'risco') {
+                        updateRiskDashboard();
+                    } else if (tab === 'mensagens') {
+                        renderMessages();
+                    } else if (tab === 'chat') {
+                        loadChats();
+                    }
+                });
+            });
+        }
+
+        // Carregar dados
+        async function loadData() {
+            // ============================================
+            // INTEGRAÇÃO COM BACKEND
+            // ============================================
+            const BACKEND_URL_CHECKLISTS = null; // Exemplo: 'http://localhost:5000/api/checklists'
+            const BACKEND_URL_MESSAGES = null; // Exemplo: 'http://localhost:5000/api/mensagens'
+
+            if (BACKEND_URL_CHECKLISTS) {
+                // Buscar do backend
+                fetch(BACKEND_URL_CHECKLISTS)
+                    .then(res => res.json())
+                    .then(data => {
+                        allChecklists = Array.isArray(data) ? data : [];
+                        console.log('📥 Checklists carregados do backend:', allChecklists.length);
+                        filterChecklists();
+                    })
+                    .catch(err => {
+                        console.error('❌ Erro ao carregar checklists do backend:', err);
+                        loadFromDatabase();
+                    });
+            } else {
+                // Usar banco de dados IndexedDB
+                await loadFromDatabase();
+            }
+
+            if (BACKEND_URL_MESSAGES) {
+                fetch(BACKEND_URL_MESSAGES)
+                    .then(res => res.json())
+                    .then(data => {
+                        allMessages = Array.isArray(data) ? data : [];
+                        renderMessages();
+                    })
+                    .catch(err => {
+                        console.error('❌ Erro ao carregar mensagens do backend:', err);
+                        loadMessagesFromDatabase();
+                    });
+            } else {
+                await loadMessagesFromDatabase();
+            }
+        }
+
+        // Carregar do banco de dados ou backend
+        async function loadFromDatabase() {
+            try {
+                // Tentar backend primeiro
+                const backendChecklists = await getChecklistsFromBackend();
+                if (backendChecklists) {
+                    allChecklists = backendChecklists;
+                    console.log('📥 Checklists carregados do backend:', allChecklists.length);
+                    filterChecklists();
+                    return;
+                }
+
+                // Fallback para IndexedDB
+                if (db && db.db) {
+                    allChecklists = await db.obterChecklists();
+                    console.log('📥 Checklists carregados do IndexedDB:', allChecklists.length);
+                    filterChecklists();
+                } else {
+                    // Fallback para localStorage
+                    console.log('⚠️ Banco não inicializado, usando localStorage...');
+                    loadFromLocalStorage();
+                }
+            } catch (e) {
+                console.error('❌ Erro ao carregar:', e);
+                loadFromLocalStorage();
+            }
+        }
+
+        async function loadMessagesFromDatabase() {
+            try {
+                // Tentar backend primeiro
+                if (typeof apiRequest === 'function') {
+                    try {
+                        const backendMessages = await apiRequest('/mensagens');
+                        if (backendMessages) {
+                            allMessages = backendMessages;
+                            console.log('📥 Mensagens carregadas do backend:', allMessages.length);
+                            renderMessages();
+                            return;
+                        }
+                    } catch (e) {
+                        console.log('⚠️ Backend não disponível para mensagens');
+                    }
+                }
+
+                // Fallback para IndexedDB
+                if (db && db.db) {
+                    allMessages = await db.obterMensagens();
+                    console.log('📥 Mensagens carregadas do IndexedDB:', allMessages.length);
+                    renderMessages();
+                } else {
+                    loadMessagesFromLocalStorage();
+                }
+            } catch (e) {
+                console.error('❌ Erro ao carregar mensagens:', e);
+                loadMessagesFromLocalStorage();
+            }
+        }
+
+        // Carregar do localStorage (modo standalone)
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('cummins_checklists');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    allChecklists = Array.isArray(parsed) ? parsed : [];
+                    console.log('📥 Checklists carregados:', allChecklists.length);
+                } catch (e) {
+                    console.error('❌ Erro ao carregar checklists salvos:', e);
+                    allChecklists = [];
+                }
+            } else {
+                console.log('⚠️ Nenhum checklist encontrado no localStorage');
+                allChecklists = [];
+            }
+            // Sempre filtrar após carregar
+            filterChecklists();
+        }
+
+        function loadMessagesFromLocalStorage() {
+            const saved = localStorage.getItem('cummins_mensagens');
+            if (saved) {
+                try {
+                    allMessages = JSON.parse(saved);
+                } catch (e) {
+                    allMessages = [];
+                }
+            }
+            renderMessages();
+        }
+
+        // Filtrar checklists
+        function filterChecklists() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+
+            filteredChecklists = allChecklists.filter(checklist => {
+                const matchesSearch =
+                    (checklist.nome_operador || '').toLowerCase().includes(searchTerm) ||
+                    (checklist.doca_numero || '').toLowerCase().includes(searchTerm) ||
+                    (checklist.placa_veiculo || '').toLowerCase().includes(searchTerm);
+
+                const matchesStatus =
+                    statusFilter === 'todos' || checklist.status_checklist === statusFilter;
+
+                const matchesDate = !dateFilter || (checklist.data_operacao && checklist.data_operacao.startsWith(dateFilter));
+
+                return matchesSearch && matchesStatus && matchesDate;
+            });
+
+            renderChecklists();
+            updateExportCount();
+        }
+
+        // Limpar filtros
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = 'todos';
+            document.getElementById('dateFilter').value = '';
+            filterChecklists();
+        }
+
+        // Renderizar tabela de checklists
+        function renderChecklists() {
+            const tbody = document.getElementById('checklistsTableBody');
+
+            // Atualizar contadores
+            document.getElementById('totalRecordsCount').textContent = allChecklists.length;
+            document.getElementById('recordsCount').textContent = filteredChecklists.length;
+
+            if (filteredChecklists.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Nenhum registro encontrado</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filteredChecklists.map(checklist => {
+                const dataCriacao = checklist.data_envio || checklist.created_date || new Date().toISOString();
+                const dataFormatada = new Date(dataCriacao).toLocaleString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const statusBadge = checklist.status_checklist === 'Conforme' ?
+                    '<span class="badge badge-success">Conforme</span>' :
+                    '<span class="badge badge-danger">Alerta Gerado</span>';
+
+                const riscoBadge = getRiscoBadge(checklist.nivel_risco || 'Baixo');
+
+                return `
+                    <tr>
+                        <td>${dataFormatada}</td>
+                        <td>${checklist.horario_inicio || '-'}</td>
+                        <td>${checklist.nome_operador || '-'}</td>
+                        <td>${checklist.doca_numero || '-'}</td>
+                        <td>${checklist.tipo_veiculo || '-'}</td>
+                        <td>${checklist.placa_veiculo || '-'}</td>
+                        <td>${statusBadge}</td>
+                        <td>${riscoBadge}</td>
+                        <td>
+                            <button class="btn btn-outline" onclick="showDetails('${checklist.id || Math.random()}')" style="padding: 6px 12px; font-size: 12px;">
+                                👁️ Ver
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            // Forçar aplicação de estilos dos badges após renderização
+            setTimeout(() => {
+                document.querySelectorAll('.badge-success').forEach(badge => {
+                    badge.style.setProperty('background', '#22c55e', 'important');
+                    badge.style.setProperty('color', 'white', 'important');
+                });
+                document.querySelectorAll('.badge-danger').forEach(badge => {
+                    badge.style.setProperty('background', '#ef4444', 'important');
+                    badge.style.setProperty('color', 'white', 'important');
+                });
+                document.querySelectorAll('.badge-warning').forEach(badge => {
+                    badge.style.setProperty('background', '#f59e0b', 'important');
+                    badge.style.setProperty('color', 'white', 'important');
+                });
+            }, 50);
+        }
+
+        // Badge de risco
+        function getRiscoBadge(nivel) {
+            const badges = {
+                'Baixo': '<span class="badge badge-success">Baixo</span>',
+                'Médio': '<span class="badge badge-warning">Médio</span>',
+                'Alto': '<span class="badge badge-danger">Alto</span>',
+                'Crítico': '<span class="badge badge-critical">Crítico</span>'
+            };
+            return badges[nivel] || badges['Baixo'];
+        }
+
+        // Mostrar detalhes
+        function showDetails(checklistId) {
+            const checklist = allChecklists.find(c => (c.id || Math.random().toString()) === checklistId);
+            if (!checklist) return;
+
+            const modalBody = document.getElementById('modalBody');
+            const problemas = checklist.problemas_identificados || [];
+
+            modalBody.innerHTML = `
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Operador</div>
+                        <div class="detail-value">${checklist.nome_operador || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Doca</div>
+                        <div class="detail-value">${checklist.doca_numero || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Data Operação</div>
+                        <div class="detail-value">${checklist.data_operacao || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Horário Início</div>
+                        <div class="detail-value">${checklist.horario_inicio || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Tipo Veículo</div>
+                        <div class="detail-value">${checklist.tipo_veiculo || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Placa</div>
+                        <div class="detail-value">${checklist.placa_veiculo || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Quantidade Volumes</div>
+                        <div class="detail-value">${checklist.qtd_volumes || 0}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Status</div>
+                        <div class="detail-value">${getRiscoBadge(checklist.status_checklist)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Nível de Risco</div>
+                        <div class="detail-value">${getRiscoBadge(checklist.nivel_risco || 'Baixo')}</div>
+                    </div>
+                </div>
+
+                ${problemas.length > 0 ? `
+                    <div style="margin-top: 24px;">
+                        <div class="detail-label" style="margin-bottom: 12px;">Problemas Identificados</div>
+                        <ul style="list-style: none; padding: 0;">
+                            ${problemas.map(p => `<li style="padding: 8px; background: #fee2e2; border-radius: 6px; margin-bottom: 8px;">⚠️ ${p}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+
+                ${checklist.observacoes ? `
+                    <div style="margin-top: 24px;">
+                        <div class="detail-label" style="margin-bottom: 8px;">Observações</div>
+                        <div class="detail-value">${checklist.observacoes}</div>
+                    </div>
+                ` : ''}
+
+                ${checklist.fotos && checklist.fotos.length > 0 ? `
+                    <div style="margin-top: 24px;">
+                        <div class="detail-label" style="margin-bottom: 12px;">Fotos (${checklist.fotos.length})</div>
+                        <div class="photo-grid">
+                            ${checklist.fotos.map(foto => `
+                                <div class="photo-item">
+                                    <img src="${foto}" alt="Foto" onclick="window.open('${foto}', '_blank')">
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        // Fechar modal
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        // Fechar modal ao clicar fora
+        document.getElementById('detailModal').addEventListener('click', (e) => {
+            if (e.target.id === 'detailModal') {
+                closeModal();
+            }
+        });
+
+        // Exportar para Excel (CSV)
+        function exportToExcel() {
+            if (filteredChecklists.length === 0) {
+                alert('Nenhum registro para exportar');
+                return;
+            }
+
+            const headers = [
+                "ID", "Data Criação", "Data Operação", "Horário Início",
+                "Operador", "Doca", "Tipo Veículo", "Placa", "Quantidade Volumes",
+                "Status", "Q1: Altura Material", "Q2: Acondicionamento", "Q3: Material Avaria",
+                "Q4: Sem Arquivamento", "Q5: Sem Calço", "Q6: Buracos Piso",
+                "Q7: Guia Garfo", "Q8: Área Obstruída", "Nível de Risco",
+                "Problemas Identificados", "Observações", "Fotos (URLs)"
+            ];
+
+            const rows = filteredChecklists.map(c => [
+                c.id || '',
+                c.data_envio || c.created_date || '',
+                c.data_operacao || '',
+                c.horario_inicio || '',
+                c.nome_operador || '',
+                c.doca_numero || '',
+                c.tipo_veiculo || '',
+                c.placa_veiculo || '',
+                c.qtd_volumes || 0,
+                c.status_checklist || '',
+                c.q1_altura_material_acima_limite ? "SIM" : "NÃO",
+                c.q2_acondicionamento_inadequado ? "SIM" : "NÃO",
+                c.q3_material_com_avaria ? "SIM" : "NÃO",
+                c.q4_material_sem_arquivamento ? "SIM" : "NÃO",
+                c.q5_veiculo_sem_calco ? "SIM" : "NÃO",
+                c.q6_buracos_no_piso ? "SIM" : "NÃO",
+                c.q7_guia_garfo_fora_posicionamento ? "SIM" : "NÃO",
+                c.q8_area_manobra_obstruida ? "SIM" : "NÃO",
+                c.nivel_risco || "Baixo",
+                (c.problemas_identificados || []).join("; "),
+                c.observacoes || '',
+                (c.fotos || []).join("; ")
+            ]);
+
+            const csvContent = [
+                headers.join(","),
+                ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+            ].join("\n");
+
+            const BOM = "\uFEFF";
+            const blob = new Blob([BOM + csvContent], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+
+            link.setAttribute("href", url);
+            link.setAttribute("download", `cummins_checklists_${new Date().toISOString().slice(0,10)}_${Date.now()}.csv`);
+            link.style.visibility = "hidden";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function updateExportCount() {
+            document.getElementById('exportCount').textContent = filteredChecklists.length;
+        }
+
+        // Configurar gráficos
+        function setupCharts() {
+            // Gráfico será criado quando a tab de risco for aberta
+        }
+
+        // Atualizar dashboard de risco
+        function updateRiskDashboard() {
+            const total = allChecklists.length;
+            const alertas = allChecklists.filter(c => c.status_checklist === 'Alerta Gerado').length;
+            const conformes = allChecklists.filter(c => c.status_checklist === 'Conforme').length;
+            const critico = allChecklists.filter(c => c.nivel_risco === 'Crítico').length;
+
+            document.getElementById('totalChecklists').textContent = total;
+            document.getElementById('totalAlertas').textContent = alertas;
+            document.getElementById('totalConformes').textContent = conformes;
+            document.getElementById('riscoCritico').textContent = critico;
+
+            // Gráfico de distribuição de risco
+            const riscoData = {
+                'Baixo': allChecklists.filter(c => c.nivel_risco === 'Baixo').length,
+                'Médio': allChecklists.filter(c => c.nivel_risco === 'Médio').length,
+                'Alto': allChecklists.filter(c => c.nivel_risco === 'Alto').length,
+                'Crítico': allChecklists.filter(c => c.nivel_risco === 'Crítico').length
+            };
+
+            if (riskChart) riskChart.destroy();
+            const riskCtx = document.getElementById('riskChart').getContext('2d');
+            riskChart = new Chart(riskCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(riscoData),
+                    datasets: [{
+                        data: Object.values(riscoData),
+                        backgroundColor: ['#3b82f6', '#f59e0b', '#ef4444', '#991b1b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // Gráfico de alertas por dia
+            const alertsByDay = {};
+            allChecklists.filter(c => c.status_checklist === 'Alerta Gerado').forEach(c => {
+                const date = c.data_operacao || c.data_envio?.split('T')[0] || new Date().toISOString().split('T')[0];
+                alertsByDay[date] = (alertsByDay[date] || 0) + 1;
+            });
+
+            const sortedDates = Object.keys(alertsByDay).sort();
+            if (alertsChart) alertsChart.destroy();
+            const alertsCtx = document.getElementById('alertsChart').getContext('2d');
+            alertsChart = new Chart(alertsCtx, {
+                type: 'line',
+                data: {
+                    labels: sortedDates,
+                    datasets: [{
+                        label: 'Alertas',
+                        data: sortedDates.map(d => alertsByDay[d]),
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Gráfico de problemas mais frequentes
+            const problemsCount = {};
+            allChecklists.forEach(c => {
+                (c.problemas_identificados || []).forEach(p => {
+                    problemsCount[p] = (problemsCount[p] || 0) + 1;
+                });
+            });
+
+            const sortedProblems = Object.entries(problemsCount)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            if (problemsChart) problemsChart.destroy();
+            const problemsCtx = document.getElementById('problemsChart').getContext('2d');
+            problemsChart = new Chart(problemsCtx, {
+                type: 'bar',
+                data: {
+                    labels: sortedProblems.map(p => p[0].substring(0, 30) + '...'),
+                    datasets: [{
+                        label: 'Ocorrências',
+                        data: sortedProblems.map(p => p[1]),
+                        backgroundColor: '#F7323F'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // Renderizar mensagens
+        function renderMessages() {
+            const container = document.getElementById('messagesList');
+            document.getElementById('messagesCount').textContent = allMessages.length;
+
+            if (allMessages.length === 0) {
+                container.innerHTML = '<div class="empty-state">Nenhuma mensagem encontrada</div>';
+                return;
+            }
+
+            container.innerHTML = allMessages.map(msg => {
+                const dataFormatada = msg.data_criacao 
+                    ? new Date(msg.data_criacao).toLocaleString('pt-BR')
+                    : new Date().toLocaleString('pt-BR');
+                
+                return `
+                    <div class="message-item ${msg.status === 'Não Lida' ? 'unread' : ''}">
+                        <div class="message-header">
+                            <div class="message-sender">${msg.remetente || 'Operador'} - ${msg.tipo_remetente || 'Operador'}</div>
+                            <div class="message-date">${dataFormatada}</div>
+                        </div>
+                        <div class="message-content">${msg.mensagem || ''}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Simular dados de teste (remova quando integrar com backend)
+        function createTestData() {
+            if (allChecklists.length === 0) {
+                const testChecklist = {
+                    id: '1',
+                    nome_operador: 'João Silva',
+                    doca_numero: 'Doca 01',
+                    data_operacao: new Date().toISOString().split('T')[0],
+                    horario_inicio: '14:30',
+                    tipo_veiculo: 'Rebocadores',
+                    placa_veiculo: 'ABC-1234',
+                    qtd_volumes: 10,
+                    status_checklist: 'Alerta Gerado',
+                    nivel_risco: 'Médio',
+                    problemas_identificados: ['Veículo sem calço?', 'Acondicionamento inadequado/inseguro?'],
+                    observacoes: 'Observação de teste',
+                    fotos: [],
+                    data_envio: new Date().toISOString()
+                };
+                allChecklists = [testChecklist];
+                localStorage.setItem('cummins_checklists', JSON.stringify(allChecklists));
+            }
+        }
+
+        // Inicializar quando a página carregar
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Admin inicializando...');
+            
+            // Verificação de acesso removida - acesso livre ao painel administrativo
+            
+            // Verificar se veio de um redirecionamento (tem timestamp na URL)
+            const urlParams = new URLSearchParams(window.location.search);
+            const isRedirect = urlParams.has('t');
+            
+            if (isRedirect) {
+                console.log('📥 Redirecionamento detectado - forçando reload dos dados...');
+                // Limpar cache e recarregar
+                setTimeout(() => {
+                    loadFromLocalStorage();
+                    loadMessagesFromLocalStorage();
+                }, 200);
+            }
+            
+            // Carregar dados primeiro
+            loadFromLocalStorage();
+            loadMessagesFromLocalStorage();
+            
+            // Criar dados de teste apenas se não houver dados
+            if (allChecklists.length === 0) {
+                console.log('📝 Criando dados de teste...');
+                createTestData();
+                loadFromLocalStorage();
+            }
+            
+            // Inicializar interface
+            init();
+            
+            // Forçar atualização após um pequeno delay para garantir que tudo foi carregado
+            setTimeout(() => {
+                console.log('🔄 Atualização final dos dados...');
+                loadFromLocalStorage();
+                filterChecklists();
+                console.log('✅ Total de checklists:', allChecklists.length);
+            }, 300);
+        });
+
+        // Atualizar quando a página ganhar foco (volta do formulário)
+        window.addEventListener('focus', () => {
+            console.log('🔄 Página ganhou foco - recarregando dados...');
+            loadFromLocalStorage();
+            loadMessagesFromLocalStorage();
+            filterChecklists();
+            if (document.getElementById('tab-risco').classList.contains('active')) {
+                updateRiskDashboard();
+            }
+            if (document.getElementById('tab-mensagens').classList.contains('active')) {
+                renderMessages();
+            }
+        });
+
+        // Escutar evento customizado quando um checklist for salvo
+        window.addEventListener('checklistSalvo', (e) => {
+            console.log('📥 Novo checklist recebido! Total:', e.detail.total);
+            const checklist = e.detail.checklist;
+            
+            // Notificar admin
+            if (typeof mostrarNotificacao === 'function') {
+                const tipo = checklist.status_checklist === 'Alerta Gerado' ? 'error' : 'success';
+                mostrarNotificacao(tipo, 'Novo Checklist Recebido', 
+                    `${checklist.nome_operador || 'Operador'} enviou um novo checklist`,
+                    { url: '#', texto: 'Ver Checklist' }
+                );
+            }
+            
+            loadFromLocalStorage();
+            filterChecklists();
+            if (document.getElementById('tab-risco').classList.contains('active')) {
+                updateRiskDashboard();
+            }
+        });
+
+        // ============================================
+        // SISTEMA DE CHAT
+        // ============================================
+        let allChats = []; // Todas as conversas
+        let currentChatUser = null; // Usuário da conversa atual
+        let currentChatMessages = []; // Mensagens da conversa atual
+
+        // Carregar conversas
+        async function loadChats() {
+            try {
+                // Tentar backend primeiro
+                const backendChats = await getChatsFromBackend();
+                if (backendChats) {
+                    allChats = backendChats;
+                    renderChatList();
+                    updateChatBadge();
+                    return;
+                }
+                
+                // Fallback para IndexedDB
+                if (db && db.db) {
+                    allChats = await db.obterTodosChats();
+                } else {
+                    // Fallback para localStorage
+                    const saved = localStorage.getItem('cummins_chats');
+                    if (saved) {
+                        try {
+                            allChats = JSON.parse(saved);
+                        } catch (e) {
+                            allChats = [];
+                        }
+                    } else {
+                        allChats = [];
+                    }
+                }
+            } catch (e) {
+                console.error('Erro ao carregar chats:', e);
+                const saved = localStorage.getItem('cummins_chats');
+                allChats = saved ? JSON.parse(saved) : [];
+            }
+            renderChatList();
+            updateChatBadge();
+        }
+
+        // Renderizar lista de conversas
+        function renderChatList() {
+            const container = document.getElementById('chatList');
+            const searchTerm = (document.getElementById('chatSearch')?.value || '').toLowerCase();
+
+            // Obter lista única de operadores dos checklists
+            const operators = [...new Set(allChecklists.map(c => ({
+                email: c.email_operador || '',
+                nome: c.nome_operador || 'Operador',
+                wwid: c.wwid || ''
+            })).filter(o => o.email))];
+
+            // Filtrar por busca
+            const filteredOperators = operators.filter(op => 
+                op.nome.toLowerCase().includes(searchTerm) ||
+                op.email.toLowerCase().includes(searchTerm)
+            );
+
+            if (filteredOperators.length === 0) {
+                container.innerHTML = '<div class="empty-state">Nenhum operador encontrado</div>';
+                return;
+            }
+
+            // Obter última mensagem de cada operador
+            const chatsWithMessages = filteredOperators.map(op => {
+                const userChats = allChats.filter(c => c.userEmail === op.email);
+                const lastMessage = userChats.length > 0 
+                    ? userChats.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0]
+                    : null;
+                
+                const unreadCount = userChats.filter(c => 
+                    c.from === 'operator' && !c.read
+                ).length;
+
+                return {
+                    ...op,
+                    lastMessage,
+                    unreadCount
+                };
+            });
+
+            // Ordenar por última mensagem (mais recente primeiro)
+            chatsWithMessages.sort((a, b) => {
+                if (!a.lastMessage && !b.lastMessage) return 0;
+                if (!a.lastMessage) return 1;
+                if (!b.lastMessage) return -1;
+                return new Date(b.lastMessage.timestamp) - new Date(a.lastMessage.timestamp);
+            });
+
+            container.innerHTML = chatsWithMessages.map(chat => {
+                const isActive = currentChatUser?.email === chat.email;
+                const preview = chat.lastMessage 
+                    ? (chat.lastMessage.text || '').substring(0, 50) + (chat.lastMessage.text?.length > 50 ? '...' : '')
+                    : 'Nenhuma mensagem ainda';
+                const time = chat.lastMessage 
+                    ? formatChatTime(chat.lastMessage.timestamp)
+                    : '';
+
+                return `
+                    <div class="chat-item ${isActive ? 'active' : ''} ${chat.unreadCount > 0 ? 'unread' : ''}" 
+                         onclick="selectChat('${chat.email}', '${chat.nome}', '${chat.wwid}')">
+                        <div class="chat-item-header">
+                            <div class="chat-item-name">${chat.nome}</div>
+                            ${time ? `<div class="chat-item-time">${time}</div>` : ''}
+                        </div>
+                        <div class="chat-item-preview">${preview}</div>
+                        ${chat.unreadCount > 0 ? `<div style="margin-top: 8px;"><span class="chat-item-badge">${chat.unreadCount} nova(s)</span></div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Selecionar conversa
+        function selectChat(userEmail, userName, wwid) {
+            currentChatUser = { email: userEmail, nome: userName, wwid };
+            
+            // Atualizar UI
+            document.getElementById('chatEmpty').style.display = 'none';
+            document.getElementById('chatActive').style.display = 'flex';
+            document.getElementById('chatUserName').textContent = userName;
+            document.getElementById('chatUserEmail').textContent = userEmail;
+            document.getElementById('chatAvatar').textContent = userName.charAt(0).toUpperCase();
+
+            // Carregar mensagens desta conversa
+            loadChatMessages(userEmail);
+            
+            // Marcar mensagens como lidas
+            markChatAsRead(userEmail);
+            
+            // Atualizar lista
+            renderChatList();
+        }
+
+        // Carregar mensagens da conversa
+        async function loadChatMessages(userEmail) {
+            try {
+                // Tentar backend primeiro
+                const backendChats = await getChatsFromBackend(userEmail);
+                if (backendChats) {
+                    currentChatMessages = backendChats;
+                    renderChatMessages();
+                    return;
+                }
+                
+                // Fallback para IndexedDB
+                if (db && db.db) {
+                    currentChatMessages = await db.obterChatsPorUsuario(userEmail);
+                } else {
+                    // Fallback
+                    currentChatMessages = allChats.filter(c => c.userEmail === userEmail)
+                        .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                }
+            } catch (e) {
+                console.error('Erro ao carregar mensagens:', e);
+                currentChatMessages = allChats.filter(c => c.userEmail === userEmail)
+                    .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            }
+            renderChatMessages();
+        }
+
+        // Renderizar mensagens do chat
+        function renderChatMessages() {
+            const container = document.getElementById('chatMessages');
+            
+            if (currentChatMessages.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>Nenhuma mensagem ainda. Inicie a conversa!</p></div>';
+                return;
+            }
+
+            container.innerHTML = currentChatMessages.map(msg => {
+                const isAdmin = msg.from === 'admin';
+                const time = formatChatTime(msg.timestamp);
+                const avatar = isAdmin ? '👑' : msg.userName?.charAt(0).toUpperCase() || '👤';
+
+                return `
+                    <div class="chat-message ${isAdmin ? 'admin' : 'operator'}">
+                        <div class="chat-message-avatar">${avatar}</div>
+                        <div class="chat-message-content">
+                            <div class="chat-message-text">${msg.text || ''}</div>
+                            <div class="chat-message-time">${time}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Scroll para o final
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Enviar mensagem
+        async function sendChatMessage() {
+            if (!currentChatUser) {
+                alert('Selecione uma conversa primeiro');
+                return;
+            }
+
+            const input = document.getElementById('chatMessageInput');
+            const text = input.value.trim();
+
+            if (!text) {
+                return;
+            }
+
+            const auth = JSON.parse(localStorage.getItem('cummins_auth') || '{}');
+            const adminName = auth.nome || 'Administrador';
+            const adminEmail = auth.email || 'admin@cummins.com';
+
+            const newMessage = {
+                id: 'MSG_' + Date.now(),
+                userEmail: currentChatUser.email,
+                userName: currentChatUser.nome,
+                from: 'admin',
+                fromName: adminName,
+                fromEmail: adminEmail,
+                text: text,
+                timestamp: new Date().toISOString(),
+                read: false
+            };
+
+            // Salvar no backend ou banco de dados
+            try {
+                // Tentar backend primeiro
+                const backendResult = await saveChatToBackend(newMessage);
+                if (!backendResult) {
+                    // Fallback para IndexedDB
+                    if (db && db.db) {
+                        await db.salvarChatMessage(newMessage);
+                    } else {
+                        // Fallback para localStorage
+                        allChats.push(newMessage);
+                        localStorage.setItem('cummins_chats', JSON.stringify(allChats));
+                    }
+                }
+                allChats.push(newMessage);
+            } catch (e) {
+                console.error('Erro ao salvar mensagem:', e);
+                // Fallback
+                allChats.push(newMessage);
+                localStorage.setItem('cummins_chats', JSON.stringify(allChats));
+            }
+
+            // Limpar input
+            input.value = '';
+
+            // Atualizar UI
+            currentChatMessages.push(newMessage);
+            renderChatMessages();
+            renderChatList();
+
+            // Disparar evento
+            window.dispatchEvent(new CustomEvent('chatMessageSent', { detail: newMessage }));
+        }
+
+        // Marcar mensagens como lidas
+        async function markChatAsRead(userEmail) {
+            allChats.forEach(chat => {
+                if (chat.userEmail === userEmail && chat.from === 'operator' && !chat.read) {
+                    chat.read = true;
+                    // Atualizar no banco também
+                    if (db && db.db) {
+                        db.salvarChatMessage(chat).catch(e => console.error('Erro ao atualizar chat:', e));
+                    }
+                }
+            });
+            // Salvar no localStorage também (fallback)
+            localStorage.setItem('cummins_chats', JSON.stringify(allChats));
+            updateChatBadge();
+        }
+
+        // Atualizar badge de não lidas
+        function updateChatBadge() {
+            const unreadCount = allChats.filter(c => c.from === 'operator' && !c.read).length;
+            const badge = document.getElementById('chatBadge');
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+
+        // Filtrar conversas
+        function filterChats() {
+            renderChatList();
+        }
+
+        // Atualizar conversas
+        function refreshChats() {
+            loadChats();
+            if (currentChatUser) {
+                loadChatMessages(currentChatUser.email);
+            }
+        }
+
+        // Formatar hora do chat
+        function formatChatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Agora';
+            if (diffMins < 60) return `${diffMins}m atrás`;
+            if (diffHours < 24) return `${diffHours}h atrás`;
+            if (diffDays < 7) return `${diffDays}d atrás`;
+            
+            return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        }
+
+        // Tecla Enter para enviar
+        function handleChatKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendChatMessage();
+            }
+        }
+
+        // Escutar evento customizado quando uma mensagem for salva
+        window.addEventListener('mensagemSalva', (e) => {
+            console.log('💬 Nova mensagem recebida!');
+            const msg = e.detail.mensagem;
+            
+            // Notificar admin
+            if (typeof mostrarNotificacao === 'function') {
+                mostrarNotificacao('info', 'Nova Mensagem', 
+                    `${msg.remetente || 'Operador'} enviou uma mensagem`,
+                    { url: '#', texto: 'Ver Mensagens' }
+                );
+            }
+            
+            loadMessagesFromLocalStorage();
+            loadChats(); // Atualizar chats também
+            if (document.getElementById('tab-mensagens').classList.contains('active')) {
+                renderMessages();
+            }
+            if (document.getElementById('tab-chat').classList.contains('active')) {
+                if (currentChatUser) {
+                    loadChatMessages(currentChatUser.email);
+                }
+                renderChatList();
+            }
+        });
+
+        // Variável para rastrear últimas mensagens verificadas por operador
+        let ultimasMensagensVerificadas = {};
+
+        // Verificar novas mensagens dos operadores
+        async function verificarNovasMensagensOperadores() {
+            try {
+                let allChats = [];
+                
+                // Tentar backend primeiro
+                if (typeof getChatsFromBackend === 'function') {
+                    allChats = await getChatsFromBackend() || [];
+                } else if (db && db.db) {
+                    allChats = await db.obterTodosChats();
+                } else {
+                    const saved = localStorage.getItem('cummins_chats');
+                    allChats = saved ? JSON.parse(saved) : [];
+                }
+                
+                // Filtrar apenas mensagens de operadores não lidas
+                const mensagensOperadores = allChats.filter(c => 
+                    c.from === 'operator' && 
+                    !c.read
+                );
+                
+                // Agrupar por operador e verificar novas mensagens
+                const mensagensPorOperador = {};
+                mensagensOperadores.forEach(msg => {
+                    if (!mensagensPorOperador[msg.userEmail]) {
+                        mensagensPorOperador[msg.userEmail] = [];
+                    }
+                    mensagensPorOperador[msg.userEmail].push(msg);
+                });
+                
+                // Verificar novas mensagens de cada operador
+                Object.keys(mensagensPorOperador).forEach(userEmail => {
+                    const mensagens = mensagensPorOperador[userEmail].sort((a, b) => 
+                        new Date(a.timestamp) - new Date(b.timestamp)
+                    );
+                    const ultimaMensagem = mensagens[mensagens.length - 1];
+                    
+                    // Se é uma mensagem nova (não verificada antes)
+                    if (!ultimasMensagensVerificadas[userEmail] || 
+                        ultimaMensagem.id !== ultimasMensagensVerificadas[userEmail]) {
+                        
+                        // Notificar admin
+                        if (typeof mostrarNotificacao === 'function') {
+                            mostrarNotificacao('chat', '💬 Nova Mensagem', 
+                                `${ultimaMensagem.userName || 'Operador'} enviou: ${ultimaMensagem.text.substring(0, 50)}...`,
+                                { 
+                                    url: '#', 
+                                    texto: 'Abrir Chat',
+                                    onclick: () => {
+                                        // Abrir chat com este operador
+                                        selectChat(userEmail, ultimaMensagem.userName, '');
+                                        document.querySelector('.tab-trigger[data-tab="chat"]').click();
+                                    }
+                                }
+                            );
+                        }
+                        
+                        ultimasMensagensVerificadas[userEmail] = ultimaMensagem.id;
+                    }
+                });
+                
+                // Atualizar badge
+                updateChatBadge();
+            } catch (e) {
+                console.error('Erro ao verificar novas mensagens:', e);
+            }
+        }
+
+        // Escutar mensagens de chat do operador
+        window.addEventListener('chatMessageSent', (e) => {
+            const msg = e.detail;
+            
+            // Se for mensagem do operador, notificar admin imediatamente
+            if (msg.from === 'operator') {
+                if (typeof mostrarNotificacao === 'function') {
+                    mostrarNotificacao('chat', '💬 Nova Mensagem do Operador', 
+                        `${msg.userName || 'Operador'} enviou: ${msg.text.substring(0, 50)}...`,
+                        { 
+                            url: '#', 
+                            texto: 'Abrir Chat',
+                            onclick: () => {
+                                selectChat(msg.userEmail, msg.userName, '');
+                                document.querySelector('.tab-trigger[data-tab="chat"]').click();
+                            }
+                        }
+                    );
+                }
+            }
+            
+            loadChats();
+            if (currentChatUser && e.detail.userEmail === currentChatUser.email) {
+                loadChatMessages(currentChatUser.email);
+            }
+        });
+
+        // Atualizar quando houver mudanças no localStorage (de outras abas)
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'cummins_checklists' || e.key === 'cummins_mensagens') {
+                console.log('🔄 Storage atualizado:', e.key);
+                loadFromLocalStorage();
+                loadMessagesFromLocalStorage();
+                filterChecklists();
+                if (document.getElementById('tab-risco').classList.contains('active')) {
+                    updateRiskDashboard();
+                }
+                if (document.getElementById('tab-mensagens').classList.contains('active')) {
+                    renderMessages();
+                }
+            }
+        });
+
+        // Atualizar periodicamente (a cada 2 segundos) para detectar novos checklists
+        setInterval(() => {
+            const currentCount = allChecklists.length;
+            loadFromLocalStorage();
+            if (allChecklists.length !== currentCount) {
+                console.log('🔄 Novo checklist detectado! Total:', allChecklists.length);
+                filterChecklists();
+                if (document.getElementById('tab-risco').classList.contains('active')) {
+                    updateRiskDashboard();
+                }
+                if (document.getElementById('tab-mensagens').classList.contains('active')) {
+                    renderMessages();
+                }
+            }
+        }, 2000);
+
+        // Verificar novas mensagens de chat periodicamente
+        setInterval(async () => {
+            await verificarNovasMensagensOperadores();
+        }, 3000); // Verificar a cada 3 segundos
+
+        // ============================================
+        // TECLADO VIRTUAL
+        // ============================================
+        let tecladoVirtualAdminInstance = null;
+        let tecladoInputAdminAtual = null;
+
+        function toggleTecladoVirtualAdmin(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) {
+                console.error('Input não encontrado:', inputId);
+                return;
+            }
+
+            // Se já existe uma instância e está visível, fechar
+            if (tecladoVirtualAdminInstance && tecladoVirtualAdminInstance.isVisible) {
+                tecladoVirtualAdminInstance.hide();
+                tecladoVirtualAdminInstance = null;
+                tecladoInputAdminAtual = null;
+                return;
+            }
+
+            // Se já existe instância mas para outro input, apenas trocar o input
+            if (tecladoVirtualAdminInstance) {
+                tecladoVirtualAdminInstance.input = input;
+                tecladoInputAdminAtual = inputId;
+                tecladoVirtualAdminInstance.show();
+                return;
+            }
+
+            // Criar nova instância com modo híbrido ativado
+            tecladoVirtualAdminInstance = new TecladoVirtual(input, {
+                layout: 'pt-BR',
+                theme: 'light',
+                hybrid: true // Ativar sincronização com teclado físico
+            });
+            tecladoInputAdminAtual = inputId;
+            tecladoVirtualAdminInstance.show();
+
+            // Focar no input
+            input.focus();
+        }
+
+    </script>
+</body>
+
+</html>

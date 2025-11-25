@@ -1,0 +1,48 @@
+===========================================
+COMANDOS PARA SALVAR NO GITHUB
+===========================================
+
+PASSO 1: Criar repositório no GitHub
+-------------------------------------
+1. Acesse: https://github.com/new
+2. Nome: cummins-checklist (ou outro)
+3. Clique em "Create repository"
+4. COPIE a URL do repositório (ex: https://github.com/seu-usuario/cummins-checklist.git)
+
+PASSO 2: Configurar Git (primeira vez apenas)
+----------------------------------------------
+git config --global user.name "Seu Nome"
+git config --global user.email "seu.email@exemplo.com"
+
+PASSO 3: Inicializar repositório local
+----------------------------------------
+git init
+
+PASSO 4: Adicionar arquivos
+----------------------------
+git add .
+
+PASSO 5: Criar primeiro commit
+-------------------------------
+git commit -m "Commit inicial - Sistema CUMMINS"
+
+PASSO 6: Conectar ao GitHub
+-----------------------------
+git remote add origin https://github.com/SEU-USUARIO/SEU-REPOSITORIO.git
+(SUBSTITUA pela URL do seu repositório)
+
+PASSO 7: Enviar para o GitHub
+------------------------------
+git branch -M main
+git push -u origin main
+
+===========================================
+COMANDOS PARA ATUALIZAÇÕES FUTURAS
+===========================================
+
+git add .
+git commit -m "Descrição das mudanças"
+git push
+
+===========================================
+

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUMMINS - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #F7323F 0%, #D91E2A 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: #F7323F;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 12px rgba(247, 50, 63, 0.3);
+        }
+
+        .logo span {
+            color: white;
+            font-size: 48px;
+            font-weight: 900;
+        }
+
+        .logo-section h1 {
+            font-size: 28px;
+            font-weight: 900;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .logo-section p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .microsoft-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #F7323F;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: #F7323F;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(247, 50, 63, 0.3);
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        .btn-login:hover {
+            background: #D91E2A;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(247, 50, 63, 0.4);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-section">
+            <div class="logo">
+                <span>C</span>
+            </div>
+            <h1>CUMMINS</h1>
+            <p>Sistema de Gestão Logística</p>
+        </div>
+
+        <div class="microsoft-badge">
+            <span>🔐</span>
+            <span>Microsoft SSO</span>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">E-mail Corporativo</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    required 
+                    placeholder="seu.email@cummins.com"
+                    autocomplete="email"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    required 
+                    placeholder="Digite sua senha"
+                    autocomplete="current-password"
+                >
+            </div>
+
+            <button type="submit" class="btn-login" id="loginBtn">
+                Entrar com Microsoft
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Simulação de login SSO Microsoft
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('errorMessage');
+            const loginBtn = document.getElementById('loginBtn');
+            
+            // Simular validação básica
+            if (!email.includes('@')) {
+                errorDiv.textContent = 'Por favor, insira um e-mail válido.';
+                errorDiv.classList.add('show');
+                return;
+            }
+            
+            // Desabilitar botão
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Autenticando...';
+            
+            // Simular autenticação SSO (em produção, integraria com Microsoft Azure AD)
+            setTimeout(() => {
+                // Detectar perfil baseado no email
+                const emailLower = email.toLowerCase();
+                const isAdmin = emailLower.includes('admin') || emailLower.includes('gestor');
+                
+                // Salvar dados de autenticação simulada
+                const authData = {
+                    email: email,
+                    authenticated: true,
+                    isAdmin: isAdmin,
+                    perfil: isAdmin ? 'admin' : 'operador',
+                    timestamp: new Date().toISOString()
+                };
+                
+                localStorage.setItem('cummins_auth', JSON.stringify(authData));
+                
+                // Redirecionar baseado no perfil
+                if (isAdmin) {
+                    // Admin/Gestor vai direto para o painel administrativo
+                    window.location.href = 'cummins-admin.html';
+                } else {
+                    // Operador vai para identificação primeiro
+                    window.location.href = 'cummins-identificacao.html';
+                }
+            }, 1500);
+        });
+
+        // Verificar se já está autenticado
+        const authData = localStorage.getItem('cummins_auth');
+        if (authData) {
+            try {
+                const auth = JSON.parse(authData);
+                if (auth.authenticated) {
+                    // Verificar se expirou (24 horas)
+                    const authTime = new Date(auth.timestamp);
+                    const now = new Date();
+                    const hoursDiff = (now - authTime) / (1000 * 60 * 60);
+                    
+                    if (hoursDiff < 24) {
+                        // Redirecionar baseado no perfil
+                        if (auth.isAdmin) {
+                            window.location.href = 'cummins-admin.html';
+                        } else {
+                            window.location.href = 'cummins-identificacao.html';
+                        }
+                    }
+                }
+            } catch (e) {
+                // Continuar com login
+            }
+        }
+    </script>
+</body>
+</html>

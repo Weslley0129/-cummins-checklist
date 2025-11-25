@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self';">
+    <title>CUMMINS - Identificação</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(to bottom right, #f8fafc, #e2e8f0);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .logo {
+            width: 64px;
+            height: 64px;
+            background: #F7323F;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+        
+        .logo span {
+            color: white;
+            font-size: 32px;
+            font-weight: 900;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 900;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 12px;
+        }
+        
+        input,
+        select {
+            width: 100%;
+            padding: 20px;
+            border: 3px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 18px;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: white;
+        }
+        
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #F7323F;
+            box-shadow: 0 0 0 4px rgba(247, 50, 63, 0.1);
+        }
+        
+        .btn-continue {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #F7323F 0%, #D91E2A 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(247, 50, 63, 0.3);
+            transition: all 0.2s;
+            margin-top: 8px;
+            min-height: 64px;
+        }
+        
+        .btn-continue:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(247, 50, 63, 0.4);
+        }
+        
+        .btn-continue:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        .btn-continue:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .user-info {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #475569;
+        }
+        
+        .user-info strong {
+            color: #0f172a;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <div class="logo">
+                    <span>C</span>
+                </div>
+                <h1>Identificação do Operador</h1>
+                <p>Complete seus dados para continuar</p>
+            </div>
+
+            <div id="userInfo" class="user-info" style="display: none;">
+                <strong>Usuário:</strong> <span id="userEmail"></span>
+            </div>
+
+            <form id="identificacaoForm">
+                <div class="form-group">
+                    <label for="nome">Nome Completo *</label>
+                    <input type="text" id="nome" required placeholder="Digite seu nome completo" autocomplete="name" minlength="3">
+                </div>
+
+                <div class="form-group">
+                    <label for="wwid">WWID (ID Global) *</label>
+                    <input type="text" id="wwid" required placeholder="Digite seu WWID">
+                </div>
+
+                <div class="form-group">
+                    <label for="turno">Turno de Trabalho *</label>
+                    <select id="turno" required>
+                        <option value="">Selecione o turno</option>
+                        <option value="Manhã">Manhã (07:00 - 16:00)</option>
+                        <option value="Tarde">Tarde (14:00 - 22:00)</option>
+                        <option value="Noite">Noite (22:00 - 06:00)</option>
+                        <option value="Administrativo">Administrativo</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-continue" id="continueBtn">
+                    Continuar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // FUNÇÕES DE SEGURANÇA
+        // ============================================
+
+        /**
+         * Sanitiza input removendo caracteres perigosos
+         * Previne XSS e injeção de código
+         */
+        function sanitizeInput(input) {
+            if (typeof input !== 'string') return '';
+
+            // Criar elemento temporário para escape automático
+            const div = document.createElement('div');
+            div.textContent = input;
+            let sanitized = div.textContent || div.innerText || '';
+
+            // Remover caracteres de controle (0x00-0x1F, 0x7F)
+            sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, '');
+
+            // Remover tags HTML que possam ter escapado
+            sanitized = sanitized
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#x27;')
+                .replace(/\//g, '&#x2F;');
+
+            return sanitized.trim();
+        }
+
+        /**
+         * Valida formato de nome (apenas letras, espaços e acentos)
+         */
+        function validateNome(nome) {
+            if (!nome || typeof nome !== 'string') return false;
+            // Permitir letras, espaços, acentos e caracteres especiais comuns em nomes
+            const nomeRegex = /^[a-zA-ZÀ-ÿ\s'-]{3,100}$/;
+            return nomeRegex.test(nome.trim());
+        }
+
+        /**
+         * Valida formato de WWID (alfanumérico e hífen)
+         */
+        function validateWWID(wwid) {
+            if (!wwid || typeof wwid !== 'string') return false;
+            // Permitir apenas letras maiúsculas, números e hífen
+            const wwidRegex = /^[A-Z0-9\-]{3,20}$/;
+            return wwidRegex.test(wwid.trim().toUpperCase());
+        }
+
+        /**
+         * Valida turno (apenas valores permitidos)
+         */
+        function validateTurno(turno) {
+            const turnosValidos = ['Manhã', 'Tarde', 'Noite', 'Administrativo'];
+            return turnosValidos.includes(turno);
+        }
+
+        /**
+         * Mascara email para não expor dados sensíveis
+         */
+        function maskEmail(email) {
+            if (!email || typeof email !== 'string' || !email.includes('@')) {
+                return '***';
+            }
+
+            try {
+                const [localPart, domain] = email.split('@');
+                if (!localPart || !domain) return '***';
+
+                // Mascarar parte local (mostrar apenas 2 primeiros caracteres)
+                const maskedLocal = localPart.length > 2 ?
+                    localPart.substring(0, 2) + '*'.repeat(Math.min(localPart.length - 2, 5)) :
+                    '**';
+
+                // Mascarar domínio (mostrar apenas 2 primeiros caracteres)
+                const maskedDomain = domain.length > 2 ?
+                    domain.substring(0, 2) + '*'.repeat(Math.min(domain.length - 2, 5)) :
+                    '**';
+
+                return `${maskedLocal}@${maskedDomain}`;
+            } catch (e) {
+                return '***';
+            }
+        }
+
+        /**
+         * Verifica se autenticação é válida e não expirou
+         */
+        function validateAuth() {
+            try {
+                const authData = localStorage.getItem('cummins_auth');
+                if (!authData) {
+                    return false;
+                }
+
+                const auth = JSON.parse(authData);
+
+                // Verificar se está autenticado
+                if (!auth.authenticated || !auth.email) {
+                    return false;
+                }
+
+                // Verificar expiração (se existir timestamp)
+                if (auth.timestamp) {
+                    const authTime = new Date(auth.timestamp);
+                    const now = new Date();
+                    const hoursDiff = (now - authTime) / (1000 * 60 * 60);
+
+                    // Expirar após 24 horas
+                    if (hoursDiff >= 24) {
+                        localStorage.removeItem('cummins_auth');
+                        return false;
+                    }
+                }
+
+                // Verificar se não é admin tentando acessar página de operador
+                // (Admin deve ir para página de admin)
+                if (auth.isAdmin === true || auth.perfil === 'admin') {
+                    // Redirecionar admin para página correta
+                    window.location.href = 'cummins-admin.html';
+                    return false;
+                }
+
+                return auth;
+            } catch (e) {
+                console.error('Erro ao validar autenticação:', e);
+                localStorage.removeItem('cummins_auth');
+                return false;
+            }
+        }
+
+        // ============================================
+        // VERIFICAÇÃO DE AUTENTICAÇÃO
+        // ============================================
+
+        const auth = validateAuth();
+        if (!auth) {
+            window.location.href = 'cummins-login.html';
+        } else {
+            // Exibir email mascarado (não completo)
+            const emailMasked = maskEmail(auth.email);
+            document.getElementById('userEmail').textContent = emailMasked;
+            document.getElementById('userInfo').style.display = 'block';
+        }
+
+        // ============================================
+        // CARREGAR DADOS SALVOS (COM SANITIZAÇÃO)
+        // ============================================
+
+        const savedData = localStorage.getItem('cummins_operador');
+        if (savedData) {
+            try {
+                const data = JSON.parse(savedData);
+                // Sanitizar antes de exibir
+                if (data.nome) {
+                    const nomeSanitized = sanitizeInput(data.nome);
+                    if (validateNome(nomeSanitized)) {
+                        document.getElementById('nome').value = nomeSanitized;
+                    }
+                }
+                if (data.wwid) {
+                    const wwidSanitized = sanitizeInput(data.wwid).toUpperCase();
+                    if (validateWWID(wwidSanitized)) {
+                        document.getElementById('wwid').value = wwidSanitized;
+                    }
+                }
+                if (data.turno && validateTurno(data.turno)) {
+                    document.getElementById('turno').value = data.turno;
+                }
+            } catch (e) {
+                console.error('Erro ao carregar dados salvos:', e);
+                // Limpar dados corrompidos
+                localStorage.removeItem('cummins_operador');
+            }
+        }
+
+        // ============================================
+        // SALVAR DADOS AO DIGITAR (COM VALIDAÇÃO)
+        // ============================================
+
+        document.getElementById('nome').addEventListener('input', function() {
+            const nomeInput = this;
+            const nomeValue = nomeInput.value;
+
+            // Validar em tempo real
+            if (nomeValue && !validateNome(nomeValue)) {
+                nomeInput.setCustomValidity('Nome inválido. Use apenas letras, espaços e acentos (3-100 caracteres).');
+            } else {
+                nomeInput.setCustomValidity('');
+            }
+
+            saveData();
+        });
+
+        document.getElementById('wwid').addEventListener('input', function() {
+            const wwidInput = this;
+            let wwidValue = wwidInput.value.toUpperCase();
+
+            // Remover caracteres inválidos em tempo real
+            wwidValue = wwidValue.replace(/[^A-Z0-9\-]/g, '');
+            if (wwidInput.value !== wwidValue) {
+                wwidInput.value = wwidValue;
+            }
+
+            // Validar em tempo real
+            if (wwidValue && !validateWWID(wwidValue)) {
+                wwidInput.setCustomValidity('WWID inválido. Use apenas letras maiúsculas, números e hífen (3-20 caracteres).');
+            } else {
+                wwidInput.setCustomValidity('');
+            }
+
+            saveData();
+        });
+
+        document.getElementById('turno').addEventListener('change', saveData);
+
+        function saveData() {
+            try {
+                const nomeRaw = document.getElementById('nome').value.trim();
+                const wwidRaw = document.getElementById('wwid').value.toUpperCase().trim();
+                const turnoRaw = document.getElementById('turno').value;
+
+                // Sanitizar antes de salvar
+                const nome = sanitizeInput(nomeRaw);
+                const wwid = sanitizeInput(wwidRaw).toUpperCase();
+                const turno = sanitizeInput(turnoRaw);
+
+                // Validar antes de salvar
+                if (nome && !validateNome(nome)) return;
+                if (wwid && !validateWWID(wwid)) return;
+                if (turno && !validateTurno(turno)) return;
+
+                const data = {
+                    nome: nome,
+                    wwid: wwid,
+                    turno: turno
+                };
+
+                localStorage.setItem('cummins_operador', JSON.stringify(data));
+            } catch (e) {
+                console.error('Erro ao salvar dados:', e);
+            }
+        }
+
+        // ============================================
+        // ENVIAR FORMULÁRIO (COM VALIDAÇÃO E SANITIZAÇÃO)
+        // ============================================
+
+        document.getElementById('identificacaoForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Desabilitar botão para evitar múltiplos envios
+            const submitBtn = document.getElementById('continueBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processando...';
+
+            try {
+                // Obter valores brutos
+                const nomeRaw = document.getElementById('nome').value.trim();
+                const wwidRaw = document.getElementById('wwid').value.toUpperCase().trim();
+                const turnoRaw = document.getElementById('turno').value;
+
+                // Validar campos obrigatórios
+                if (!nomeRaw || !wwidRaw || !turnoRaw) {
+                    alert('Por favor, preencha todos os campos obrigatórios.');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Continuar';
+                    return;
+                }
+
+                // Sanitizar inputs
+                const nome = sanitizeInput(nomeRaw);
+                const wwid = sanitizeInput(wwidRaw).toUpperCase();
+                const turno = sanitizeInput(turnoRaw);
+
+                // Validação rigorosa
+                if (!validateNome(nome)) {
+                    alert('Nome inválido. Use apenas letras, espaços e acentos (3-100 caracteres).');
+                    document.getElementById('nome').focus();
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Continuar';
+                    return;
+                }
+
+                if (!validateWWID(wwid)) {
+                    alert('WWID inválido. Use apenas letras maiúsculas, números e hífen (3-20 caracteres).');
+                    document.getElementById('wwid').focus();
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Continuar';
+                    return;
+                }
+
+                if (!validateTurno(turno)) {
+                    alert('Turno inválido. Selecione uma opção válida.');
+                    document.getElementById('turno').focus();
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Continuar';
+                    return;
+                }
+
+                // Verificar autenticação novamente antes de salvar
+                const currentAuth = validateAuth();
+                if (!currentAuth) {
+                    alert('Sessão expirada. Faça login novamente.');
+                    window.location.href = 'cummins-login.html';
+                    return;
+                }
+
+                // Criar objeto de dados sanitizado
+                const operadorData = {
+                    nome: nome,
+                    wwid: wwid,
+                    turno: turno,
+                    email: currentAuth.email, // Usar email da autenticação validada
+                    identificado: true,
+                    timestamp: new Date().toISOString()
+                };
+
+                // Salvar dados sanitizados
+                localStorage.setItem('cummins_operador', JSON.stringify(operadorData));
+
+                // Redirecionar para dashboard do operador
+                window.location.href = 'cummins-operador.html';
+
+            } catch (error) {
+                console.error('Erro ao processar formulário:', error);
+                alert('Erro ao processar dados. Tente novamente.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Continuar';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUMMINS - Dashboard Operador</title>
+    <!-- Sistema de Banco de Dados -->
+    <script src="database.js"></script>
+    <script src="backend_helper.js"></script>
+    <!-- Sistema de Notificações -->
+    <script src="notificacoes.js"></script>
+    <!-- Teclado Virtual -->
+    <script src="teclado_virtual.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(to bottom right, #f8fafc, #e2e8f0);
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            width: 56px;
+            height: 56px;
+            background: #F7323F;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(247, 50, 63, 0.3);
+        }
+
+        .logo span {
+            color: white;
+            font-weight: 900;
+            font-size: 28px;
+        }
+
+        .header-text h1 {
+            font-size: 24px;
+            font-weight: 900;
+            color: #0f172a;
+        }
+
+        .header-text p {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 16px;
+        }
+
+        .user-email {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-logout:hover {
+            background: #fee2e2;
+            border-color: #F7323F;
+            color: #F7323F;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 900;
+            color: #F7323F;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-checklist {
+            width: 100%;
+            padding: 24px;
+            background: linear-gradient(135deg, #F7323F 0%, #D91E2A 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 22px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(247, 50, 63, 0.4);
+            transition: all 0.2s;
+            min-height: 80px;
+            touch-action: manipulation;
+        }
+
+        .btn-checklist:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(247, 50, 63, 0.5);
+        }
+
+        .btn-checklist:active {
+            transform: translateY(0);
+        }
+
+        /* Gráfico de Produtividade CSS Puro */
+        .chart-container {
+            margin-top: 20px;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 200px;
+            gap: 8px;
+            padding: 0 8px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, #F7323F, #FF6B6B);
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            min-width: 40px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .chart-bar:hover {
+            opacity: 0.8;
+            transform: scaleY(1.05);
+        }
+
+        .chart-bar-label {
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .chart-bar-value {
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+            background: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .chart-axis {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 32px;
+            padding: 0 8px;
+        }
+
+        .chart-y-axis {
+            position: absolute;
+            left: -40px;
+            top: 0;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .recent-checklists {
+            margin-top: 24px;
+        }
+
+        .checklist-item {
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid #F7323F;
+        }
+
+        .checklist-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .checklist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 8px;
+        }
+
+        .checklist-date {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .checklist-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-conforme {
+            background: #22c55e;
+            color: white;
+        }
+
+        .status-alerta {
+            background: #ef4444;
+            color: white;
+        }
+
+        .checklist-info {
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .chat-badge {
+            background: #F7323F;
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+
+        .chat-message-operator {
+            margin-bottom: 16px;
+            display: flex;
+            gap: 12px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-message-operator.operator {
+            justify-content: flex-end;
+        }
+
+        .chat-message-operator.admin {
+            justify-content: flex-start;
+        }
+
+        .chat-message-operator .message-bubble {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .chat-message-operator.operator .message-bubble {
+            background: linear-gradient(135deg, #F7323F 0%, #D91E2A 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-message-operator.admin .message-bubble {
+            background: white;
+            border: 2px solid #e2e8f0;
+            color: #0f172a;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <span>C</span>
+                </div>
+                <div class="header-text">
+                    <h1>CUMMINS</h1>
+                    <p>Dashboard Pessoal</p>
+                </div>
+            </div>
+            <div class="user-info">
+                <div class="user-name" id="userName">Operador</div>
+                <div class="user-email" id="userEmail">email@cummins.com</div>
+                <a href="#" onclick="logout()" class="btn-logout" style="margin-top: 8px;">Sair</a>
+            </div>
+        </div>
+
+        <!-- Estatísticas Pessoais -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalPessoal">0</div>
+                <div class="stat-label">Meus Checklists</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="conformesPessoal">0</div>
+                <div class="stat-label">Conformes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="alertasPessoal">0</div>
+                <div class="stat-label">Alertas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="taxaConformidade">0%</div>
+                <div class="stat-label">Taxa Conformidade</div>
+            </div>
+        </div>
+
+        <!-- Gráfico de Produtividade -->
+        <div class="card">
+            <div class="card-title">
+                <span>📊</span>
+                <span>Produtividade da Semana</span>
+            </div>
+            <div class="chart-container">
+                <div style="position: relative;">
+                    <div class="chart-y-axis">
+                        <span id="maxValue">0</span>
+                        <span id="midValue">0</span>
+                        <span>0</span>
+                    </div>
+                    <div class="chart-bars" id="productivityChart">
+                        <!-- Gráfico será gerado via JavaScript -->
+                    </div>
+                </div>
+                <div class="chart-axis"></div>
+            </div>
+        </div>
+
+        <!-- Botão Checklist -->
+        <div class="card">
+            <button class="btn-checklist" onclick="window.location.href='cummins-checklist.html'">
+                ➕ INICIAR NOVO CHECKLIST
+            </button>
+        </div>
+
+        <!-- Chat com Admin -->
+        <div class="card" id="chatCard">
+            <div class="card-title">
+                <span>💬</span>
+                <span>Chat com Administração</span>
+                <span class="chat-badge" id="chatBadge" style="display: none;">0</span>
+            </div>
+            <div id="chatContainer" style="display: none;">
+                <div class="chat-messages-operator" id="chatMessagesOperator" style="max-height: 400px; overflow-y: auto; margin-bottom: 16px; padding: 16px; background: #f8fafc; border-radius: 8px; min-height: 200px;">
+                    <!-- Mensagens serão inseridas aqui -->
+                </div>
+                <div style="display: flex; gap: 8px; align-items: flex-end;">
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                        <textarea 
+                            id="chatInputOperator" 
+                            placeholder="Digite sua mensagem para responder..." 
+                            style="flex: 1; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-family: inherit; resize: none; font-size: 14px; transition: border-color 0.2s;"
+                            rows="2"
+                            onkeydown="handleOperatorChatKeyDown(event)"
+                            onfocus="this.style.borderColor='#F7323F'"
+                            onblur="this.style.borderColor='#e2e8f0'"
+                        ></textarea>
+                        <button 
+                            onclick="toggleTecladoVirtual('chatInputOperator')"
+                            style="padding: 8px 16px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 12px; font-weight: 600; color: #64748b; cursor: pointer; align-self: flex-start;"
+                        >
+                            ⌨️ Teclado Virtual
+                        </button>
+                    </div>
+                    <button 
+                        class="btn-checklist" 
+                        onclick="sendOperatorMessage()"
+                        style="padding: 12px 24px; white-space: nowrap; min-width: 120px; transition: all 0.2s;"
+                        onmouseover="this.style.transform='scale(1.05)'"
+                        onmouseout="this.style.transform='scale(1)'"
+                    >
+                        📤 Enviar
+                    </button>
+                </div>
+                <div style="margin-top: 8px; font-size: 12px; color: #64748b; text-align: center;">
+                    💡 Pressione Enter para enviar, Shift+Enter para nova linha
+                </div>
+            </div>
+            <div id="chatToggle" style="text-align: center; padding: 20px;">
+                <button class="btn-checklist" onclick="toggleChat()" style="width: 100%;">
+                    💬 Abrir Chat
+                </button>
+            </div>
+        </div>
+
+        <!-- Checklists Recentes -->
+        <div class="card">
+            <div class="card-title">
+                <span>📋</span>
+                <span>Meus Checklists Recentes</span>
+            </div>
+            <div class="recent-checklists" id="recentChecklists">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📝</div>
+                    <div>Nenhum checklist registrado ainda</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userEmail = '';
+        let userName = '';
+
+        // Carregar dados do usuário
+        function loadUserData() {
+            const auth = localStorage.getItem('cummins_auth');
+            const operador = localStorage.getItem('cummins_operador');
+            
+            if (!auth) {
+                window.location.href = 'cummins-login.html';
+                return;
+            }
+
+            try {
+                const authData = JSON.parse(auth);
+                userEmail = authData.email || '';
+                
+                if (operador) {
+                    const operadorData = JSON.parse(operador);
+                    userName = operadorData.nome || 'Operador';
+                }
+                
+                document.getElementById('userEmail').textContent = userEmail;
+                document.getElementById('userName').textContent = userName;
+            } catch (e) {
+                console.error('Erro ao carregar dados do usuário');
+                window.location.href = 'cummins-login.html';
+            }
+        }
+
+        // Carregar dados pessoais do operador
+        async function loadPersonalData() {
+            try {
+                let allChecklists = [];
+                
+                // Tentar backend primeiro
+                if (typeof getChecklistsFromBackend === 'function' && userEmail) {
+                    try {
+                        const backendChecklists = await getChecklistsFromBackend({ email_operador: userEmail });
+                        if (backendChecklists && Array.isArray(backendChecklists)) {
+                            allChecklists = backendChecklists;
+                            console.log('📥 Checklists carregados do backend:', allChecklists.length);
+                        }
+                    } catch (e) {
+                        console.log('⚠️ Backend não disponível, usando localStorage...');
+                    }
+                }
+                
+                // Se não carregou do backend, tentar IndexedDB
+                if (allChecklists.length === 0 && db && db.db) {
+                    try {
+                        allChecklists = await db.obterChecklists({ email_operador: userEmail });
+                        console.log('📥 Checklists carregados do IndexedDB:', allChecklists.length);
+                    } catch (e) {
+                        console.log('⚠️ IndexedDB não disponível, usando localStorage...');
+                    }
+                }
+                
+                // Fallback para localStorage - carregar TODOS os checklists
+                if (allChecklists.length === 0) {
+                    const saved = localStorage.getItem('cummins_checklists');
+                    if (saved) {
+                        try {
+                            allChecklists = JSON.parse(saved);
+                            console.log('📥 Checklists carregados do localStorage:', allChecklists.length);
+                        } catch (e) {
+                            console.error('❌ Erro ao parsear checklists do localStorage:', e);
+                            allChecklists = [];
+                        }
+                    } else {
+                        console.log('⚠️ Nenhum checklist encontrado no localStorage');
+                    }
+                }
+                
+                // Filtrar apenas checklists deste operador (por email ou nome)
+                let personalChecklists = [];
+                if (userEmail || userName) {
+                    personalChecklists = allChecklists.filter(c => {
+                        const checklistEmail = (c.email_operador || '').toLowerCase();
+                        const checklistNome = (c.nome_operador || '').toLowerCase();
+                        const userEmailLower = (userEmail || '').toLowerCase();
+                        const userNameLower = (userName || '').toLowerCase();
+                        
+                        // Se não tem filtro específico, mostrar todos
+                        if (!userEmail && !userName) {
+                            return true;
+                        }
+                        
+                        return checklistEmail === userEmailLower || 
+                               checklistNome === userNameLower ||
+                               (checklistEmail && userEmailLower && checklistEmail.includes(userEmailLower)) ||
+                               (checklistNome && userNameLower && checklistNome.includes(userNameLower));
+                    });
+                } else {
+                    // Se não tem dados do usuário, mostrar todos os checklists
+                    personalChecklists = allChecklists;
+                }
+                
+                console.log('✅ Checklists filtrados para o operador:', personalChecklists.length);
+
+                // Estatísticas
+                const total = personalChecklists.length;
+                const conformes = personalChecklists.filter(c => c.status_checklist === 'Conforme').length;
+                const alertas = personalChecklists.filter(c => c.status_checklist === 'Alerta Gerado').length;
+                const taxa = total > 0 ? Math.round((conformes / total) * 100) : 0;
+
+                updateStats(total, conformes, alertas, taxa);
+
+                // Gráfico de produtividade (últimos 7 dias)
+                const productivityData = calculateProductivity(personalChecklists);
+                renderProductivityChart(productivityData);
+
+                // Checklists recentes
+                const recent = personalChecklists.slice(0, 5);
+                renderRecentChecklists(recent);
+
+            } catch (e) {
+                console.error('Erro ao carregar dados pessoais:', e);
+                updateStats(0, 0, 0);
+                renderProductivityChart([]);
+                renderRecentChecklists([]);
+            }
+        }
+
+        // Calcular produtividade dos últimos 7 dias
+        function calculateProductivity(checklists) {
+            const days = [];
+            const today = new Date();
+            
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                date.setHours(0, 0, 0, 0);
+                
+                const dateStr = date.toISOString().split('T')[0];
+                const count = checklists.filter(c => {
+                    const checklistDate = c.data_operacao || c.data_envio?.split('T')[0] || '';
+                    return checklistDate === dateStr;
+                }).length;
+                
+                days.push({
+                    date: dateStr,
+                    label: date.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' }),
+                    count: count
+                });
+            }
+            
+            return days;
+        }
+
+        // Renderizar gráfico de produtividade
+        function renderProductivityChart(data) {
+            const container = document.getElementById('productivityChart');
+            const maxCount = Math.max(...data.map(d => d.count), 1);
+            
+            // Atualizar valores do eixo Y
+            document.getElementById('maxValue').textContent = maxCount;
+            document.getElementById('midValue').textContent = Math.floor(maxCount / 2);
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div class="empty-state">Sem dados para exibir</div>';
+                return;
+            }
+            
+            container.innerHTML = data.map(day => {
+                const height = maxCount > 0 ? (day.count / maxCount) * 100 : 0;
+                return `
+                    <div class="chart-bar" style="height: ${height}%" title="${day.label}: ${day.count} checklist(s)">
+                        ${day.count > 0 ? `<div class="chart-bar-value">${day.count}</div>` : ''}
+                        <div class="chart-bar-label">${day.label}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Atualizar estatísticas
+        function updateStats(total, conformes, alertas, taxa = 0) {
+            document.getElementById('totalPessoal').textContent = total;
+            document.getElementById('conformesPessoal').textContent = conformes;
+            document.getElementById('alertasPessoal').textContent = alertas;
+            document.getElementById('taxaConformidade').textContent = taxa + '%';
+        }
+
+        // Renderizar checklists recentes
+        function renderRecentChecklists(checklists) {
+            const container = document.getElementById('recentChecklists');
+            
+            if (checklists.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <div>Nenhum checklist registrado ainda</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = checklists.map(c => {
+                const date = new Date(c.data_envio || c.created_date || Date.now());
+                const dateStr = date.toLocaleString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const status = c.status_checklist === 'Conforme' 
+                    ? '<span class="checklist-status status-conforme">✓ Conforme</span>'
+                    : '<span class="checklist-status status-alerta">⚠️ Alerta</span>';
+                
+                return `
+                    <div class="checklist-item">
+                        <div class="checklist-header">
+                            <div class="checklist-date">${dateStr}</div>
+                            ${status}
+                        </div>
+                        <div class="checklist-info">
+                            ${c.doca_numero || ''} • ${c.tipo_veiculo || ''} • ${c.placa_veiculo || ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================
+        // SISTEMA DE CHAT DO OPERADOR
+        // ============================================
+        let chatOpen = false;
+
+        // Toggle chat
+        function toggleChat() {
+            chatOpen = !chatOpen;
+            const container = document.getElementById('chatContainer');
+            const toggle = document.getElementById('chatToggle');
+            
+            if (chatOpen) {
+                container.style.display = 'block';
+                toggle.style.display = 'none';
+                loadOperatorChatMessages();
+            } else {
+                container.style.display = 'none';
+                toggle.style.display = 'block';
+            }
+        }
+
+        // Carregar mensagens do operador
+        async function loadOperatorChatMessages() {
+            if (!userEmail) return;
+
+            let myChats = [];
+            
+            try {
+                // Tentar backend primeiro
+                const backendChats = await getChatsFromBackend(userEmail);
+                if (backendChats) {
+                    myChats = backendChats;
+                } else if (db && db.db) {
+                    // Fallback para IndexedDB
+                    myChats = await db.obterChatsPorUsuario(userEmail);
+                } else {
+                    // Fallback para localStorage
+                    const saved = localStorage.getItem('cummins_chats');
+                    if (saved) {
+                        try {
+                            const allChats = JSON.parse(saved);
+                            myChats = allChats.filter(c => c.userEmail === userEmail)
+                                .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                        } catch (e) {
+                            myChats = [];
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('Erro ao carregar mensagens:', e);
+            }
+
+            // Renderizar mensagens
+            const container = document.getElementById('chatMessagesOperator');
+            
+            if (myChats.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>Nenhuma mensagem ainda. Inicie a conversa!</p></div>';
+                return;
+            }
+
+            container.innerHTML = myChats.map(msg => {
+                const isAdmin = msg.from === 'admin';
+                const time = formatChatTimeOperator(msg.timestamp);
+                const senderName = isAdmin ? 'Administração' : (msg.userName || 'Você');
+
+                return `
+                    <div class="chat-message-operator ${isAdmin ? 'admin' : 'operator'}">
+                        <div class="message-bubble">
+                            ${isAdmin ? `<div style="font-size: 11px; font-weight: 600; margin-bottom: 4px; opacity: 0.8;">${senderName}</div>` : ''}
+                            <div style="word-wrap: break-word;">${msg.text || ''}</div>
+                            <div class="chat-message-time" style="margin-top: 6px; text-align: ${isAdmin ? 'left' : 'right'};">
+                                ${time}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Scroll para o final
+            container.scrollTop = container.scrollHeight;
+
+            // Atualizar badge
+            updateOperatorChatBadge();
+        }
+
+        // Enviar mensagem do operador
+        async function sendOperatorMessage() {
+            if (!userEmail) {
+                alert('Erro: Email do operador não encontrado');
+                return;
+            }
+
+            const input = document.getElementById('chatInputOperator');
+            const text = input.value.trim();
+
+            if (!text) {
+                return;
+            }
+
+            const operador = JSON.parse(localStorage.getItem('cummins_operador') || '{}');
+            const auth = JSON.parse(localStorage.getItem('cummins_auth') || '{}');
+
+            const newMessage = {
+                id: 'MSG_' + Date.now(),
+                userEmail: userEmail,
+                userName: operador.nome || userName || 'Operador',
+                from: 'operator',
+                fromName: operador.nome || userName || 'Operador',
+                fromEmail: userEmail,
+                text: text,
+                timestamp: new Date().toISOString(),
+                read: false
+            };
+
+            // Salvar no backend ou banco de dados
+            try {
+                // Tentar backend primeiro
+                const backendResult = await saveChatToBackend(newMessage);
+                if (!backendResult) {
+                    // Fallback para IndexedDB
+                    if (db && db.db) {
+                        await db.salvarChatMessage(newMessage);
+                    } else {
+                        // Fallback para localStorage
+                        const saved = localStorage.getItem('cummins_chats');
+                        let allChats = saved ? JSON.parse(saved) : [];
+                        allChats.push(newMessage);
+                        localStorage.setItem('cummins_chats', JSON.stringify(allChats));
+                    }
+                }
+            } catch (e) {
+                console.error('Erro ao salvar mensagem:', e);
+                // Fallback
+                const saved = localStorage.getItem('cummins_chats');
+                let allChats = saved ? JSON.parse(saved) : [];
+                allChats.push(newMessage);
+                localStorage.setItem('cummins_chats', JSON.stringify(allChats));
+            }
+
+            // Limpar input
+            input.value = '';
+            
+            // Feedback visual
+            input.style.borderColor = '#22c55e';
+            setTimeout(() => {
+                input.style.borderColor = '#e2e8f0';
+            }, 500);
+
+            // Atualizar UI imediatamente (otimista)
+            const container = document.getElementById('chatMessagesOperator');
+            const time = formatChatTimeOperator(newMessage.timestamp);
+            const messageHTML = `
+                <div class="chat-message-operator operator">
+                    <div class="message-bubble">
+                        <div style="word-wrap: break-word;">${newMessage.text}</div>
+                        <div class="chat-message-time" style="margin-top: 6px; text-align: right;">
+                            ${time}
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', messageHTML);
+            container.scrollTop = container.scrollHeight;
+
+            // Atualizar do banco (para garantir sincronização)
+            await loadOperatorChatMessages();
+
+            // Disparar evento (notifica admin)
+            window.dispatchEvent(new CustomEvent('chatMessageSent', { detail: newMessage }));
+            
+            // Notificar admin via evento customizado
+            window.dispatchEvent(new CustomEvent('novaMensagemOperador', { 
+                detail: {
+                    mensagem: newMessage,
+                    operador: operador.nome || userName,
+                    email: userEmail
+                }
+            }));
+            
+            // Mostrar confirmação
+            const sendBtn = document.querySelector('#chatContainer button');
+            const originalText = sendBtn.innerHTML;
+            sendBtn.innerHTML = '✓ Enviado!';
+            sendBtn.style.background = '#22c55e';
+            setTimeout(() => {
+                sendBtn.innerHTML = originalText;
+                sendBtn.style.background = '';
+            }, 2000);
+            
+            // Notificar operador que mensagem foi enviada
+            if (typeof mostrarNotificacao === 'function') {
+                mostrarNotificacao('success', 'Mensagem Enviada', 
+                    'Sua mensagem foi enviada ao administrador',
+                    null
+                );
+            }
+        }
+
+        // Formatar hora
+        function formatChatTimeOperator(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Agora';
+            if (diffMins < 60) return `${diffMins}m atrás`;
+            if (diffHours < 24) return `${diffHours}h atrás`;
+            if (diffDays < 7) return `${diffDays}d atrás`;
+            
+            return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        }
+
+        // Atualizar badge de não lidas
+        async function updateOperatorChatBadge() {
+            if (!userEmail) return;
+
+            let allChats = [];
+            
+            try {
+                // Tentar backend primeiro
+                const backendChats = await getChatsFromBackend(userEmail);
+                if (backendChats) {
+                    allChats = backendChats;
+                } else if (db && db.db) {
+                    // Fallback para IndexedDB
+                    allChats = await db.obterChatsPorUsuario(userEmail);
+                } else {
+                    // Fallback para localStorage
+                    const saved = localStorage.getItem('cummins_chats');
+                    if (saved) {
+                        try {
+                            allChats = JSON.parse(saved);
+                        } catch (e) {
+                            allChats = [];
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('Erro ao atualizar badge:', e);
+            }
+
+            const unreadCount = allChats.filter(c => 
+                c.userEmail === userEmail && 
+                c.from === 'admin' && 
+                !c.read
+            ).length;
+
+            const badge = document.getElementById('chatBadge');
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+
+        // Tecla Enter para enviar
+        function handleOperatorChatKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendOperatorMessage();
+            }
+        }
+
+        // Escutar novas mensagens
+        window.addEventListener('chatMessageSent', async (e) => {
+            const msg = e.detail;
+            
+            // Se for mensagem do admin, notificar operador
+            if (msg.from === 'admin' && msg.userEmail === userEmail) {
+                if (typeof mostrarNotificacao === 'function') {
+                    mostrarNotificacao('chat', 'Nova Mensagem do Admin', 
+                        msg.text.substring(0, 60) + (msg.text.length > 60 ? '...' : ''),
+                        { url: '#', texto: 'Abrir Chat' }
+                    );
+                }
+            }
+            
+            if (chatOpen) {
+                await loadOperatorChatMessages();
+            }
+            await updateOperatorChatBadge();
+        });
+
+        // Atualizar periodicamente
+        setInterval(async () => {
+            if (chatOpen) {
+                await loadOperatorChatMessages();
+            } else {
+                await updateOperatorChatBadge();
+                
+                // Verificar novas mensagens do admin
+                try {
+                    let allChats = [];
+                    if (typeof getChatsFromBackend === 'function') {
+                        allChats = await getChatsFromBackend(userEmail) || [];
+                    } else if (db && db.db) {
+                        allChats = await db.obterChatsPorUsuario(userEmail);
+                    } else {
+                        const saved = localStorage.getItem('cummins_chats');
+                        allChats = saved ? JSON.parse(saved).filter(c => c.userEmail === userEmail) : [];
+                    }
+                    
+                    // Verificar mensagens não lidas do admin
+                    const novasMensagens = allChats.filter(c => 
+                        c.from === 'admin' && 
+                        !c.read &&
+                        new Date(c.timestamp) > new Date(Date.now() - 60000) // Último minuto
+                    );
+                    
+                    novasMensagens.forEach(msg => {
+                        mostrarNotificacao('chat', 'Nova Mensagem do Admin', 
+                            msg.text.substring(0, 60) + (msg.text.length > 60 ? '...' : ''),
+                            { url: '#', texto: 'Abrir Chat' }
+                        );
+                        // Marcar como lida após notificar
+                        msg.read = true;
+                    });
+                } catch (e) {
+                    console.error('Erro ao verificar novas mensagens:', e);
+                }
+            }
+        }, 2000);
+
+        // ============================================
+        // TECLADO VIRTUAL
+        // ============================================
+        let tecladoVirtualInstance = null;
+        let tecladoInputAtual = null;
+
+        function toggleTecladoVirtual(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) {
+                console.error('Input não encontrado:', inputId);
+                return;
+            }
+
+            // Se já existe uma instância e está visível, fechar
+            if (tecladoVirtualInstance && tecladoVirtualInstance.isVisible) {
+                tecladoVirtualInstance.hide();
+                tecladoVirtualInstance = null;
+                tecladoInputAtual = null;
+                return;
+            }
+
+            // Se já existe instância mas para outro input, apenas trocar o input
+            if (tecladoVirtualInstance) {
+                tecladoVirtualInstance.input = input;
+                tecladoInputAtual = inputId;
+                tecladoVirtualInstance.show();
+                return;
+            }
+
+            // Criar nova instância
+            tecladoVirtualInstance = new TecladoVirtual(input, {
+                layout: 'pt-BR',
+                theme: 'light'
+            });
+            tecladoInputAtual = inputId;
+            tecladoVirtualInstance.show();
+
+            // Focar no input
+            input.focus();
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('Deseja realmente sair?')) {
+                localStorage.removeItem('cummins_auth');
+                localStorage.removeItem('cummins_operador');
+                window.location.href = 'cummins-login.html';
+            }
+        }
+
+        // Inicializar
+        window.addEventListener('DOMContentLoaded', () => {
+            loadUserData();
+            // Aguardar um pouco para garantir que os dados do usuário foram carregados
+            setTimeout(() => {
+                loadPersonalData();
+                updateOperatorChatBadge(); // Atualizar badge de chat
+            }, 100);
+            
+            // Atualizar a cada 5 segundos
+            setInterval(() => {
+                loadPersonalData();
+                updateOperatorChatBadge(); // Atualizar badge de chat
+            }, 5000);
+        });
+        
+        // Atualizar quando a página ganhar foco
+        window.addEventListener('focus', () => {
+            loadPersonalData();
+        });
+        
+        // Escutar evento quando um checklist for salvo
+        window.addEventListener('checklistSalvo', () => {
+            console.log('📥 Novo checklist recebido! Recarregando...');
+            loadPersonalData();
+        });
+
+        // Atualizar quando houver mudanças no storage
+        window.addEventListener('storage', () => {
+            loadPersonalData();
+        });
+    </script>
+</body>
+</html>

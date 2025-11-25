@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUMMINS - Checklist de Segurança</title>
+    <!-- CSS do Teclado Virtual Híbrido -->
+    <link rel="stylesheet" href="TecladoVirtualHibrido.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        /* Cores CUMMINS (Vermelho) e JSL (Amarelo) */
+        
+         :root {
+            --cummins-red: #F7323F;
+            --cummins-red-dark: #D91E2A;
+            --jsl-yellow: #FFC107;
+            --jsl-yellow-dark: #FFA000;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(to bottom right, #f8fafc, #e2e8f0);
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+        
+        .nav-menu {
+            background: white;
+            padding: 12px 16px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 101;
+        }
+        
+        .nav-link {
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover {
+            color: #F7323F;
+            background: #fef2f2;
+        }
+        
+        .nav-link.active {
+            color: #F7323F;
+            background: #fee2e2;
+        }
+        
+        .header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 49px;
+            z-index: 100;
+            padding: 16px;
+            border-bottom: 4px solid #F7323F;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo {
+            width: 48px;
+            height: 48px;
+            background: #F7323F;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(247, 50, 63, 0.3);
+        }
+        
+        .logo span {
+            color: white;
+            font-weight: 900;
+            font-size: 20px;
+        }
+        
+        .header-text h1 {
+            font-size: 20px;
+            font-weight: 900;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+        }
+        
+        .header-text p {
+            font-size: 12px;
+            color: #475569;
+            font-weight: 500;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px 12px;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .alert-success {
+            background: #f0fdf4;
+            border: 2px solid #22c55e;
+            color: #166534;
+        }
+        
+        .alert-error {
+            background: #fef2f2;
+            border: 2px solid #ef4444;
+            color: #991b1b;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background: #f8fafc;
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .card-header.amber {
+            background: #fffbeb;
+            border-bottom-color: #fde68a;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .card-subtitle {
+            font-size: 12px;
+            color: #475569;
+            margin-top: 4px;
+        }
+        
+        .card-content {
+            padding: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+        
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #F7323F;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 96px;
+        }
+        /* Estilos específicos para textarea com teclado virtual */
+        
+        textarea.teclado-textarea {
+            border: 3px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.2s;
+        }
+        /* Campos de texto com teclado virtual - Mesmo padrão para ambos */
+        
+        textarea#observacoes.teclado-textarea,
+        textarea#mensagem_admin.teclado-textarea {
+            min-height: 180px;
+            font-size: 16px;
+            line-height: 1.6;
+            width: 100%;
+            padding: 16px;
+            border: 3px solid #e2e8f0;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+        
+        textarea#observacoes.teclado-textarea:focus,
+        textarea#mensagem_admin.teclado-textarea:focus {
+            border-color: #F7323F;
+            box-shadow: 0 0 0 4px rgba(247, 50, 63, 0.1);
+        }
+        
+        textarea.teclado-textarea:focus {
+            border-color: #F7323F;
+            box-shadow: 0 0 0 4px rgba(247, 50, 63, 0.1);
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .question-card {
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 8px;
+        }
+        
+        .question-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 12px;
+        }
+        
+        .question-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-toggle {
+            flex: 1;
+            padding: 18px 16px;
+            min-height: 64px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 18px;
+            border: 3px solid #cbd5e1;
+            background: white;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+        
+        .btn-toggle.active-yes {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-toggle.active-no {
+            background: #22c55e;
+            color: white;
+            border-color: #22c55e;
+            box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
+        }
+        /* Estilo específico para itens críticos - SIM em verde, NÃO em vermelho */
+        
+        .question-card-critico .btn-toggle.active-yes {
+            background: #22c55e !important;
+            color: white !important;
+            border-color: #22c55e !important;
+            box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3) !important;
+        }
+        
+        .question-card-critico .btn-toggle.active-no {
+            background: #ef4444 !important;
+            color: white !important;
+            border-color: #ef4444 !important;
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3) !important;
+        }
+        
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .photo-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #22c55e;
+        }
+        
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-remove {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .upload-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 20px;
+            border: 2px dashed;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+        }
+        
+        .upload-area.camera {
+            border-color: #F7323F;
+            background: #fef2f2;
+        }
+        
+        .upload-area.camera:active {
+            background: #fee2e2;
+        }
+        
+        .upload-area.gallery {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        
+        .upload-area.gallery:active {
+            background: #dbeafe;
+        }
+        
+        .upload-icon {
+            font-size: 40px;
+        }
+        
+        .upload-text {
+            font-size: 14px;
+            font-weight: 700;
+        }
+        
+        .upload-area.camera .upload-text {
+            color: #F7323F;
+        }
+        
+        .upload-area.gallery .upload-text {
+            color: #3b82f6;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #475569;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+        
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #F7323F;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 24px;
+            min-height: 72px;
+            background: linear-gradient(135deg, var(--cummins-red) 0%, var(--cummins-red-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 22px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(247, 50, 63, 0.4);
+            transition: all 0.2s;
+            position: sticky;
+            bottom: 16px;
+            margin-top: 24px;
+            touch-action: manipulation;
+        }
+        
+        .btn-submit:hover:not(:disabled) {
+            background: #D91E2A;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(247, 50, 63, 0.4);
+        }
+        
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+    <!-- Sistema de Banco de Dados -->
+    <script src="database.js"></script>
+    <script src="backend_helper.js"></script>
+    <!-- Sistema de Notificações -->
+    <script src="notificacoes.js"></script>
+    <!-- Teclado Virtual -->
+    <script src="teclado_virtual.js"></script>
+    <script>
+        // ============================================
+        // TECLADO VIRTUAL
+        // ============================================
+        let tecladoVirtualChecklistInstance = null;
+        let tecladoInputChecklistAtual = null;
+
+        function toggleTecladoVirtualChecklist(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) {
+                console.error('Input não encontrado:', inputId);
+                return;
+            }
+
+            // Se já existe uma instância e está visível, fechar
+            if (tecladoVirtualChecklistInstance && tecladoVirtualChecklistInstance.isVisible) {
+                tecladoVirtualChecklistInstance.hide();
+                tecladoVirtualChecklistInstance = null;
+                tecladoInputChecklistAtual = null;
+                return;
+            }
+
+            // Se já existe instância mas para outro input, apenas trocar o input
+            if (tecladoVirtualChecklistInstance) {
+                tecladoVirtualChecklistInstance.input = input;
+                tecladoInputChecklistAtual = inputId;
+                tecladoVirtualChecklistInstance.show();
+                return;
+            }
+
+            // Criar nova instância com modo híbrido ativado
+            tecladoVirtualChecklistInstance = new TecladoVirtual(input, {
+                layout: 'pt-BR',
+                theme: 'light',
+                hybrid: true // Ativar sincronização com teclado físico
+            });
+            tecladoInputChecklistAtual = inputId;
+            tecladoVirtualChecklistInstance.show();
+
+            // Focar no input
+            input.focus();
+        }
+    </script>
+</head>
+
+<body>
+    <!-- Navigation Menu -->
+    <div class="nav-menu" id="navMenu">
+        <a href="cummins-operador.html" class="nav-link">📊 Meu Dashboard</a>
+        <a href="cummins-checklist.html" class="nav-link active">📝 Checklist</a>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span>C</span>
+            </div>
+            <div class="header-text">
+                <h1>CUMMINS</h1>
+                <p>Checklist de Segurança</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Alertas -->
+        <div id="alertSuccess" class="alert alert-success hidden">
+            <span>✅</span>
+            <span>Checklist enviado com sucesso!</span>
+        </div>
+
+        <div id="alertError" class="alert alert-error hidden">
+            <span>⚠️</span>
+            <span id="alertMessage"></span>
+        </div>
+
+        <form id="checklistForm">
+            <!-- Dados do Operador -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">👤 Dados do Operador</div>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="nome_operador">Nome Completo *</label>
+                        <input type="text" id="nome_operador" required placeholder="Digite seu nome">
+                    </div>
+                    <div class="form-group">
+                        <label for="doca_numero">Número da Doca *</label>
+                        <input type="text" id="doca_numero" required placeholder="Ex: Doca 01">
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="data_operacao">Data *</label>
+                            <input type="date" id="data_operacao" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="horario_inicio">Horário *</label>
+                            <input type="time" id="horario_inicio" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dados do Veículo -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🚛 Dados do Veículo</div>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="tipo_veiculo">Tipo de Veículo *</label>
+                        <select id="tipo_veiculo" required>
+                            <option value="">Selecione o tipo</option>
+                            <option value="Rebocadores">Rebocadores</option>
+                            <option value="Contrabalancada combustão">Contrabalancada combustão</option>
+                            <option value="Contrabalançada elétrica">Contrabalançada elétrica</option>
+                            <option value="Contrabalancada elétrica Trilateral">Contrabalancada elétrica Trilateral</option>
+                            <option value="Paleteira elétrica com torre">Paleteira elétrica com torre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="placa_veiculo">Placa</label>
+                        <input type="text" id="placa_veiculo" placeholder="ABC-1234" style="text-transform: uppercase;">
+                    </div>
+                    <div class="form-group">
+                        <label for="qtd_volumes">Quantidade de Volumes</label>
+                        <input type="number" id="qtd_volumes" placeholder="0" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Checklist de Segurança -->
+            <div class="card">
+                <div class="card-header amber">
+                    <div class="card-title">
+                        <span>⚠️</span>
+                        <span>Checklist de Segurança</span>
+                    </div>
+                    <div class="card-subtitle">Marque SIM apenas se identificar problema</div>
+                </div>
+                <div class="card-content">
+                    <div id="questionsContainer"></div>
+                </div>
+            </div>
+
+            <!-- Espaçamento para evitar interferência do teclado virtual -->
+            <div style="height: 30px; clear: both; pointer-events: none;"></div>
+
+            <!-- Fotos -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📸 Fotos (<span id="photoCount">0</span>/10)</div>
+                </div>
+                <div class="card-content">
+                    <div id="photoGrid" class="photo-grid"></div>
+                    <div id="uploadAreas"></div>
+                    <div id="uploadLoading" class="loading hidden">
+                        <div class="spinner"></div>
+                        <span>Enviando fotos...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Espaçamento para evitar interferência do teclado virtual -->
+            <div style="height: 30px; clear: both; pointer-events: none;"></div>
+
+            <!-- Informações Adicionais -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">💬 Informações Adicionais</div>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="observacoes">Observações</label>
+                        <textarea id="observacoes" class="teclado-textarea" placeholder="Detalhes sobre a operação..."></textarea>
+                        <button type="button" onclick="toggleTecladoVirtualChecklist('observacoes')" style="margin-top: 8px; padding: 8px 16px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 12px; font-weight: 600; color: #64748b; cursor: pointer;">
+                            ⌨️ Teclado Virtual
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label for="mensagem_admin">Mensagem ao Administrador</label>
+                        <textarea id="mensagem_admin" class="teclado-textarea" placeholder="Dúvidas ou mensagens (opcional)"></textarea>
+                        <button type="button" onclick="toggleTecladoVirtualChecklist('mensagem_admin')" style="margin-top: 8px; padding: 8px 16px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 12px; font-weight: 600; color: #64748b; cursor: pointer;">
+                            ⌨️ Teclado Virtual
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Espaçamento para evitar interferência do teclado virtual -->
+            <div style="height: 20px; clear: both;"></div>
+
+            <!-- Botão Submit -->
+            <button type="submit" class="btn-submit" id="submitBtn">
+                ✓ ENVIAR CHECKLIST
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURAÇÃO DE DEBUG (Desativar em produção)
+        // ============================================
+        const DEBUG_MODE = false; // Mudar para false em produção
+
+        // Função de debug que só funciona se DEBUG_MODE estiver ativo
+        function debugLog(...args) {
+            if (DEBUG_MODE) {
+                console.log(...args);
+            }
+        }
+
+        function debugWarn(...args) {
+            if (DEBUG_MODE) {
+                console.warn(...args);
+            }
+        }
+
+        // Dados do formulário
+        let formData = {
+            nome_operador: "",
+            tipo_veiculo: "",
+            placa_veiculo: "",
+            doca_numero: "",
+            data_operacao: new Date().toISOString().split('T')[0],
+            horario_inicio: new Date().toTimeString().slice(0, 5),
+            // Itens críticos (devem ser true para aprovar)
+            q_critico_freios: false,
+            q_critico_direcao: false,
+            q_critico_sinalizacao: false,
+            // Itens regulares
+            q1_altura_material_acima_limite: false,
+            q2_acondicionamento_inadequado: false,
+            q3_material_com_avaria: false,
+            q4_material_sem_arquivamento: false,
+            q5_veiculo_sem_calco: false,
+            q6_buracos_no_piso: false,
+            q7_guia_garfo_fora_posicionamento: false,
+            q8_area_manobra_obstruida: false,
+            qtd_volumes: "",
+            observacoes: "",
+            fotos: []
+        };
+
+        let mensagemAdmin = "";
+
+        // Perguntas do checklist
+        const questions = [
+            // ITENS CRÍTICOS (bloqueiam operação se reprovados)
+            {
+                key: "q_critico_freios",
+                label: "Freios funcionando corretamente?",
+                critico: true
+            }, {
+                key: "q_critico_direcao",
+                label: "Direção funcionando corretamente?",
+                critico: true
+            }, {
+                key: "q_critico_sinalizacao",
+                label: "Sinalização e luzes funcionando?",
+                critico: true
+            },
+            // ITENS REGULARES
+            {
+                key: "q1_altura_material_acima_limite",
+                label: "Altura do material acima do limite?"
+            }, {
+                key: "q2_acondicionamento_inadequado",
+                label: "Acondicionamento inadequado/inseguro?"
+            }, {
+                key: "q3_material_com_avaria",
+                label: "Material com avaria visível?"
+            }, {
+                key: "q4_material_sem_arquivamento",
+                label: "Material sem arquivamento?"
+            }, {
+                key: "q5_veiculo_sem_calco",
+                label: "Veículo sem calço?"
+            }, {
+                key: "q6_buracos_no_piso",
+                label: "Buracos no piso?"
+            }, {
+                key: "q7_guia_garfo_fora_posicionamento",
+                label: "Guia garfo fora de posição?"
+            }, {
+                key: "q8_area_manobra_obstruida",
+                label: "Área de manobra obstruída?"
+            }
+        ];
+
+        // Inicialização
+        function init() {
+            debugLog('🚀 Inicializando checklist...');
+
+            // Garantir que os elementos existem PRIMEIRO
+            const questionsContainer = document.getElementById('questionsContainer');
+            const uploadAreas = document.getElementById('uploadAreas');
+
+            if (!questionsContainer) {
+                console.error('❌ questionsContainer não encontrado!');
+                setTimeout(init, 100);
+                return;
+            }
+
+            if (!uploadAreas) {
+                console.error('❌ uploadAreas não encontrado!');
+                setTimeout(init, 100);
+                return;
+            }
+
+            debugLog('✅ Elementos encontrados, inicializando...');
+
+            // SEMPRE renderizar perguntas e upload, mesmo sem autenticação
+            loadFromLocalStorage();
+            setupQuestions();
+            populateForm();
+            setupFormListeners();
+            setupPhotoUpload();
+            updatePhotoCount();
+
+            debugLog('✅ Checklist inicializado com sucesso!');
+            debugLog('📋 Perguntas:', questions.length);
+            debugLog('📸 Fotos carregadas:', formData.fotos ? formData.fotos.length : 0);
+
+            // Verificar autenticação APÓS renderizar (apenas para validação no envio)
+            const auth = localStorage.getItem('cummins_auth');
+            const operador = localStorage.getItem('cummins_operador');
+
+            if (!auth || !operador) {
+                debugWarn('⚠️ Usuário não autenticado - formulário será bloqueado no envio');
+            }
+        }
+
+        // Carregar dados do localStorage
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('cummins_form_data');
+            const savedMsg = localStorage.getItem('cummins_mensagem_admin');
+
+            if (saved) {
+                try {
+                    const savedData = JSON.parse(saved);
+                    debugLog('📥 Dados salvos encontrados:', savedData);
+
+                    // Mesclar dados salvos com formData padrão
+                    formData = {
+                        ...formData,
+                        ...savedData
+                    };
+
+                    // Garantir que fotos seja um array
+                    if (!Array.isArray(formData.fotos)) {
+                        formData.fotos = savedData.fotos || [];
+                    }
+
+                    debugLog('✅ Dados carregados:', {
+                        nome: formData.nome_operador,
+                        doca: formData.doca_numero,
+                        fotos: formData.fotos.length,
+                        perguntas: Object.keys(formData).filter(k => k.startsWith('q'))
+                    });
+                } catch (e) {
+                    console.error('❌ Erro ao recuperar dados salvos:', e);
+                }
+            }
+
+            if (savedMsg) {
+                mensagemAdmin = savedMsg;
+                const msgInput = document.getElementById('mensagem_admin');
+                if (msgInput) {
+                    msgInput.value = savedMsg;
+                }
+            }
+        }
+
+        // Popular formulário com dados salvos
+        function populateForm() {
+            // Preencher com dados do operador identificado
+            const operadorData = localStorage.getItem('cummins_operador');
+            if (operadorData) {
+                try {
+                    const operador = JSON.parse(operadorData);
+                    if (operador.nome) {
+                        formData.nome_operador = operador.nome;
+                        document.getElementById('nome_operador').value = operador.nome;
+                    }
+                } catch (e) {
+                    console.error('Erro ao carregar dados do operador');
+                }
+            }
+
+            const nomeInput = document.getElementById('nome_operador');
+            nomeInput.value = formData.nome_operador || nomeInput.value || '';
+            // Tornar readonly se veio do operador identificado
+            if (operadorData && nomeInput.value) {
+                nomeInput.readOnly = true;
+                nomeInput.style.background = '#f8fafc';
+                nomeInput.style.cursor = 'not-allowed';
+            }
+            document.getElementById('tipo_veiculo').value = formData.tipo_veiculo || '';
+            document.getElementById('placa_veiculo').value = formData.placa_veiculo || '';
+            document.getElementById('doca_numero').value = formData.doca_numero || '';
+            document.getElementById('data_operacao').value = formData.data_operacao || '';
+            document.getElementById('horario_inicio').value = formData.horario_inicio || '';
+            document.getElementById('qtd_volumes').value = formData.qtd_volumes || '';
+            document.getElementById('observacoes').value = formData.observacoes || '';
+
+            // Atualizar perguntas
+            questions.forEach(q => {
+                updateQuestionButton(q.key, formData[q.key]);
+            });
+
+            // Atualizar fotos
+            renderPhotos();
+        }
+
+        // Debounce para evitar muitas escritas no localStorage
+        let saveTimeout = null;
+
+        function saveToLocalStorage() {
+            // Limpar timeout anterior
+            if (saveTimeout) {
+                clearTimeout(saveTimeout);
+            }
+
+            // Aguardar 500ms antes de salvar (debounce)
+            saveTimeout = setTimeout(() => {
+                try {
+                    localStorage.setItem('cummins_form_data', JSON.stringify(formData));
+                    localStorage.setItem('cummins_mensagem_admin', mensagemAdmin);
+                } catch (e) {
+                    console.error('Erro ao salvar no localStorage:', e);
+                }
+            }, 500);
+        }
+
+        // Configurar perguntas
+        function setupQuestions() {
+            const container = document.getElementById('questionsContainer');
+            if (!container) {
+                console.error('❌ Container de perguntas não encontrado!');
+                setTimeout(setupQuestions, 100);
+                return;
+            }
+
+            debugLog('📋 Configurando', questions.length, 'perguntas...');
+
+            if (questions.length === 0) {
+                console.error('❌ Nenhuma pergunta definida!');
+                return;
+            }
+
+            container.innerHTML = '';
+
+            // Separar itens críticos e regulares
+            const criticos = questions.filter(q => q.critico);
+            const regulares = questions.filter(q => !q.critico);
+
+            // Adicionar seção de itens críticos
+            if (criticos.length > 0) {
+                const criticoSection = document.createElement('div');
+                criticoSection.style.marginBottom = '24px';
+                criticoSection.innerHTML = `
+                    <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+                        <div style="font-weight: 700; color: #991b1b; font-size: 14px;">⚠️ ITENS CRÍTICOS</div>
+                        <div style="font-size: 12px; color: #7f1d1d; margin-top: 4px;">Verifique estes itens antes de iniciar a operação</div>
+                    </div>
+                `;
+                container.appendChild(criticoSection);
+
+                criticos.forEach((q, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'question-card question-card-critico';
+                    div.style.border = '3px solid #ef4444';
+                    div.style.background = '#fef2f2';
+                    div.innerHTML = `
+                        <div class="question-text" style="color: #991b1b;">
+                            🔴 ${q.label}
+                            <span style="font-size: 12px; color: #7f1d1d; display: block; margin-top: 4px;">(Item Crítico)</span>
+                        </div>
+                        <div class="question-buttons">
+                            <button type="button" class="btn-toggle ${formData[q.key] ? 'active-no' : ''}" 
+                                    data-question="${q.key}" data-value="false" style="min-height: 56px; font-size: 16px;">
+                                ✗ NÃO
+                            </button>
+                            <button type="button" class="btn-toggle ${formData[q.key] ? 'active-yes' : ''}" 
+                                    data-question="${q.key}" data-value="true" style="min-height: 56px; font-size: 16px;">
+                                ✓ SIM
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+
+            // Adicionar seção de itens regulares
+            if (regulares.length > 0) {
+                const regularSection = document.createElement('div');
+                regularSection.innerHTML = `
+                    <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px; border-radius: 8px; margin-bottom: 16px; margin-top: 24px;">
+                        <div style="font-weight: 700; color: #92400e; font-size: 14px;">📋 ITENS REGULARES</div>
+                        <div style="font-size: 12px; color: #78350f; margin-top: 4px;">Marque SIM apenas se identificar problema</div>
+                    </div>
+                `;
+                container.appendChild(regularSection);
+
+                regulares.forEach((q, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'question-card';
+                    div.innerHTML = `
+                        <div class="question-text">${index + 1}. ${q.label}</div>
+                        <div class="question-buttons">
+                            <button type="button" class="btn-toggle ${!formData[q.key] ? 'active-no' : ''}" 
+                                    data-question="${q.key}" data-value="false" style="min-height: 56px; font-size: 16px;">
+                                ✗ NÃO
+                            </button>
+                            <button type="button" class="btn-toggle ${formData[q.key] ? 'active-yes' : ''}" 
+                                    data-question="${q.key}" data-value="true" style="min-height: 56px; font-size: 16px;">
+                                ✓ SIM
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+
+            // Adicionar listeners
+            container.querySelectorAll('.btn-toggle').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const question = this.dataset.question;
+                    const value = this.dataset.value === 'true';
+                    const questionObj = questions.find(q => q.key === question);
+
+                    // Para itens críticos, a lógica é invertida (true = aprovado)
+                    if (questionObj && questionObj.critico) {
+                        formData[question] = value; // true = aprovado, false = reprovado
+                    } else {
+                        formData[question] = value; // true = problema, false = sem problema
+                    }
+
+                    updateQuestionButton(question, value);
+                    saveToLocalStorage();
+                });
+            });
+
+            debugLog('✅ Perguntas configuradas:', {
+                criticos: criticos.length,
+                regulares: regulares.length,
+                total: questions.length
+            });
+        }
+
+        // Verificar itens críticos e bloquear se necessário
+
+        // Atualizar botão da pergunta
+        function updateQuestionButton(questionKey, value) {
+            document.querySelectorAll(`[data-question="${questionKey}"]`).forEach(btn => {
+                btn.classList.remove('active-yes', 'active-no');
+                if (btn.dataset.value === 'true') {
+                    if (value) btn.classList.add('active-yes');
+                } else {
+                    if (!value) btn.classList.add('active-no');
+                }
+            });
+        }
+
+        // Configurar listeners do formulário
+        function setupFormListeners() {
+            document.getElementById('nome_operador').addEventListener('input', (e) => {
+                formData.nome_operador = e.target.value;
+                saveToLocalStorage();
+            });
+
+            document.getElementById('tipo_veiculo').addEventListener('change', (e) => {
+                formData.tipo_veiculo = e.target.value;
+                saveToLocalStorage();
+            });
+
+            document.getElementById('placa_veiculo').addEventListener('input', (e) => {
+                formData.placa_veiculo = e.target.value.toUpperCase();
+                saveToLocalStorage();
+            });
+
+            document.getElementById('doca_numero').addEventListener('input', (e) => {
+                formData.doca_numero = e.target.value;
+                saveToLocalStorage();
+            });
+
+            document.getElementById('data_operacao').addEventListener('change', (e) => {
+                formData.data_operacao = e.target.value;
+                saveToLocalStorage();
+            });
+
+            document.getElementById('horario_inicio').addEventListener('change', (e) => {
+                formData.horario_inicio = e.target.value;
+                saveToLocalStorage();
+            });
+
+            document.getElementById('qtd_volumes').addEventListener('input', (e) => {
+                formData.qtd_volumes = e.target.value;
+                saveToLocalStorage();
+            });
+
+            document.getElementById('observacoes').addEventListener('input', (e) => {
+                formData.observacoes = e.target.value;
+                saveToLocalStorage();
+            });
+
+            document.getElementById('mensagem_admin').addEventListener('input', (e) => {
+                mensagemAdmin = e.target.value;
+                saveToLocalStorage();
+            });
+
+            document.getElementById('checklistForm').addEventListener('submit', handleSubmit);
+        }
+
+        // Configurar upload de fotos
+        function setupPhotoUpload() {
+            const uploadAreas = document.getElementById('uploadAreas');
+            if (!uploadAreas) {
+                console.error('❌ Área de upload não encontrada!');
+                setTimeout(setupPhotoUpload, 100);
+                return;
+            }
+
+            // Garantir que formData.fotos existe
+            if (!formData.fotos || !Array.isArray(formData.fotos)) {
+                formData.fotos = [];
+            }
+
+            debugLog('📸 Configurando upload de fotos...', formData.fotos.length, 'fotos já adicionadas');
+
+            if (formData.fotos.length < 10) {
+                uploadAreas.innerHTML = `
+                    <label class="upload-area camera">
+                        <span class="upload-icon">📷</span>
+                        <span class="upload-text">TIRAR FOTO</span>
+                        <input type="file" accept="image/*" capture="environment" multiple id="cameraInput">
+                    </label>
+                    <label class="upload-area gallery">
+                        <span class="upload-icon">🖼️</span>
+                        <span class="upload-text">GALERIA</span>
+                        <input type="file" accept="image/*" multiple id="galleryInput">
+                    </label>
+                `;
+
+                document.getElementById('cameraInput').addEventListener('change', handlePhotoUpload);
+                document.getElementById('galleryInput').addEventListener('change', handlePhotoUpload);
+            } else {
+                uploadAreas.innerHTML = '';
+            }
+        }
+
+        // Upload de fotos
+        function handlePhotoUpload(e) {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+
+            if (formData.fotos.length + files.length > 10) {
+                alert("Você pode anexar no máximo 10 fotos.");
+                e.target.value = '';
+                return;
+            }
+
+            document.getElementById('uploadLoading').classList.remove('hidden');
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    formData.fotos.push(e.target.result);
+                    renderPhotos();
+                    updatePhotoCount();
+                    saveToLocalStorage();
+
+                    if (formData.fotos.length >= 10) {
+                        setupPhotoUpload();
+                    }
+
+                    document.getElementById('uploadLoading').classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            });
+
+            e.target.value = '';
+        }
+
+        // Renderizar fotos
+        function renderPhotos() {
+            const grid = document.getElementById('photoGrid');
+            if (!grid) {
+                console.error('❌ Grid de fotos não encontrado!');
+                return;
+            }
+
+            grid.innerHTML = '';
+
+            // Garantir que fotos seja um array válido
+            if (!formData.fotos || !Array.isArray(formData.fotos)) {
+                formData.fotos = [];
+                updatePhotoCount();
+                return;
+            }
+
+            debugLog('📸 Renderizando', formData.fotos.length, 'fotos...');
+
+            formData.fotos.forEach((foto, index) => {
+                if (!foto) {
+                    debugWarn('⚠️ Foto inválida no índice', index);
+                    return;
+                }
+
+                const div = document.createElement('div');
+                div.className = 'photo-item';
+                div.innerHTML = `
+                    <img src="${foto}" alt="Foto ${index + 1}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <button type="button" class="photo-remove" onclick="removePhoto(${index})" title="Remover foto">×</button>
+                `;
+                grid.appendChild(div);
+            });
+
+            debugLog('✅ Fotos renderizadas:', formData.fotos.length);
+            updatePhotoCount();
+        }
+
+        // Remover foto
+        function removePhoto(index) {
+            formData.fotos.splice(index, 1);
+            renderPhotos();
+            updatePhotoCount();
+            setupPhotoUpload();
+            saveToLocalStorage();
+        }
+
+        // Atualizar contador de fotos
+        function updatePhotoCount() {
+            document.getElementById('photoCount').textContent = formData.fotos.length;
+        }
+
+        // Enviar formulário
+        async function handleSubmit(e) {
+            e.preventDefault();
+
+            // Verificar se operador está identificado
+            const operadorData = localStorage.getItem('cummins_operador');
+            if (!operadorData) {
+                alert('⚠️ Por favor, identifique-se primeiro antes de preencher o checklist.');
+                window.location.href = 'cummins-identificacao.html';
+                return;
+            }
+
+            let operador;
+            try {
+                operador = JSON.parse(operadorData);
+                if (!operador.identificado) {
+                    alert('⚠️ Por favor, complete sua identificação primeiro.');
+                    window.location.href = 'cummins-identificacao.html';
+                    return;
+                }
+            } catch (e) {
+                alert('⚠️ Erro ao verificar identificação. Por favor, identifique-se novamente.');
+                window.location.href = 'cummins-identificacao.html';
+                return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = 'Enviando...';
+
+            // Obter email do operador
+            const authData = localStorage.getItem('cummins_auth');
+            let emailOperador = '';
+            if (authData) {
+                try {
+                    const auth = JSON.parse(authData);
+                    emailOperador = auth.email || '';
+                } catch (e) {
+                    console.error('Erro ao obter email do operador');
+                }
+            }
+
+            // Coletar dados do formulário
+            formData.nome_operador = operador.nome || document.getElementById('nome_operador').value;
+            formData.wwid = operador.wwid || '';
+            formData.turno = operador.turno || '';
+            formData.email_operador = emailOperador; // Adicionar email para filtro ACL
+            formData.tipo_veiculo = document.getElementById('tipo_veiculo').value;
+            formData.placa_veiculo = document.getElementById('placa_veiculo').value;
+            formData.doca_numero = document.getElementById('doca_numero').value;
+            formData.data_operacao = document.getElementById('data_operacao').value;
+            formData.horario_inicio = document.getElementById('horario_inicio').value;
+            formData.qtd_volumes = document.getElementById('qtd_volumes').value;
+            formData.observacoes = document.getElementById('observacoes').value;
+            mensagemAdmin = document.getElementById('mensagem_admin').value;
+
+            // Identificar problemas
+            const problemas = [];
+            questions.forEach(q => {
+                if (q.critico) {
+                    // Para itens críticos, false = reprovado = problema
+                    if (!formData[q.key]) {
+                        problemas.push(q.label);
+                    }
+                } else {
+                    // Para itens regulares, true = problema identificado
+                    if (formData[q.key]) {
+                        problemas.push(q.label);
+                    }
+                }
+            });
+
+            const qtdProblemas = problemas.length;
+            let nivelRisco = "Baixo";
+            if (qtdProblemas >= 5) nivelRisco = "Crítico";
+            else if (qtdProblemas >= 3) nivelRisco = "Alto";
+            else if (qtdProblemas >= 1) nivelRisco = "Médio";
+
+            const hasProblems = problemas.length > 0;
+
+            // Preparar dados para envio
+            const checklistData = {
+                ...formData,
+                qtd_volumes: parseInt(formData.qtd_volumes) || 0,
+                status_checklist: hasProblems ? "Alerta Gerado" : "Conforme",
+                problemas_identificados: problemas,
+                nivel_risco: nivelRisco,
+                mensagem_admin: mensagemAdmin,
+                data_envio: new Date().toISOString()
+            };
+
+            // ============================================
+            // INTEGRAÇÃO COM BACKEND
+            // ============================================
+            const BACKEND_URL = null; // Configure a URL do backend aqui: 'http://localhost:5000/api/checklist'
+
+            try {
+                if (BACKEND_URL) {
+                    // Enviar para backend
+                    const response = await fetch(BACKEND_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(checklistData)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Erro do servidor: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    debugLog('Resposta do servidor:', result);
+                } else {
+                    // Modo standalone - salvar na lista de checklists
+                    debugLog('💾 Salvando checklist no localStorage...');
+
+                    // Adicionar ID único e timestamp
+                    const timestamp = Date.now();
+                    checklistData.id = `CHK_${timestamp}_${Math.random().toString(36).substr(2, 9)}`;
+                    checklistData.data_envio = new Date().toISOString();
+                    checklistData.created_date = new Date().toISOString(); // Para compatibilidade com admin
+
+                    // Salvar na lista de checklists (para o painel admin visualizar)
+                    const savedChecklists = localStorage.getItem('cummins_checklists');
+                    let checklists = [];
+
+                    try {
+                        if (savedChecklists) {
+                            checklists = JSON.parse(savedChecklists);
+                            if (!Array.isArray(checklists)) {
+                                debugWarn('⚠️ Dados corrompidos, reiniciando lista...');
+                                checklists = [];
+                            }
+                        }
+                    } catch (e) {
+                        console.error('❌ Erro ao ler checklists salvos:', e);
+                        checklists = [];
+                    }
+
+                    // Salvar no backend ou banco de dados local
+                    try {
+                        // Tentar salvar no backend primeiro
+                        const backendResult = await saveChecklistToBackend(checklistData);
+
+                        if (!backendResult) {
+                            // Fallback para IndexedDB
+                            if (db && db.db) {
+                                await db.salvarChecklist(checklistData);
+                                debugLog('✅ Checklist salvo no IndexedDB!');
+                            } else {
+                                // Fallback para localStorage
+                                const checklists = JSON.parse(localStorage.getItem('cummins_checklists') || '[]');
+                                checklists.unshift(checklistData);
+                                localStorage.setItem('cummins_checklists', JSON.stringify(checklists));
+                                debugLog('⚠️ Salvo no localStorage como fallback');
+                            }
+                        }
+
+                        // Obter total atualizado
+                        let todosChecklists = [];
+                        const backendChecklists = await getChecklistsFromBackend();
+                        if (backendChecklists) {
+                            todosChecklists = backendChecklists;
+                        } else if (db && db.db) {
+                            todosChecklists = await db.obterChecklists();
+                        } else {
+                            todosChecklists = JSON.parse(localStorage.getItem('cummins_checklists') || '[]');
+                        }
+
+                        debugLog('📊 Total de Checklists:', todosChecklists.length);
+
+                        // Disparar evento customizado para notificar outras abas/páginas
+                        window.dispatchEvent(new CustomEvent('checklistSalvo', {
+                            detail: {
+                                checklist: checklistData,
+                                total: todosChecklists.length
+                            }
+                        }));
+                    } catch (e) {
+                        console.error('❌ ERRO ao salvar:', e);
+                        // Último fallback para localStorage
+                        try {
+                            const checklists = JSON.parse(localStorage.getItem('cummins_checklists') || '[]');
+                            checklists.unshift(checklistData);
+                            localStorage.setItem('cummins_checklists', JSON.stringify(checklists));
+                            debugLog('⚠️ Salvo no localStorage como último recurso');
+                        } catch (fallbackError) {
+                            console.error('❌ Erro no fallback:', fallbackError);
+                            alert('Erro ao salvar checklist. Tente novamente.');
+                            btn.disabled = false;
+                            btn.textContent = '✓ ENVIAR CHECKLIST';
+                            return;
+                        }
+                    }
+
+                    // Salvar mensagem se houver
+                    if (mensagemAdmin.trim()) {
+                        try {
+                            const novaMensagem = {
+                                id: `MSG_${Date.now()}`,
+                                checklist_id: checklistData.id,
+                                remetente: formData.nome_operador,
+                                tipo_remetente: "Operador",
+                                mensagem: mensagemAdmin,
+                                status: "Não Lida",
+                                data_criacao: new Date().toISOString()
+                            };
+
+                            await db.salvarMensagem(novaMensagem);
+
+                            // Criar mensagem de chat também
+                            const chatMessage = {
+                                id: 'MSG_' + Date.now(),
+                                userEmail: emailOperador || '',
+                                userName: formData.nome_operador || 'Operador',
+                                from: 'operator',
+                                fromName: formData.nome_operador || 'Operador',
+                                fromEmail: emailOperador || '',
+                                text: mensagemAdmin,
+                                timestamp: new Date().toISOString(),
+                                read: false
+                            };
+
+                            // Tentar salvar no backend primeiro
+                            try {
+                                await saveChatToBackend(chatMessage);
+                            } catch (e) {
+                                // Fallback para IndexedDB ou localStorage
+                                if (db && db.db) {
+                                    await db.salvarChatMessage(chatMessage);
+                                } else {
+                                    const allChats = JSON.parse(localStorage.getItem('cummins_chats') || '[]');
+                                    allChats.push(chatMessage);
+                                    localStorage.setItem('cummins_chats', JSON.stringify(allChats));
+                                }
+                            }
+
+                            // Disparar eventos
+                            window.dispatchEvent(new CustomEvent('mensagemSalva', {
+                                detail: {
+                                    mensagem: novaMensagem
+                                }
+                            }));
+                            window.dispatchEvent(new CustomEvent('chatMessageSent', {
+                                detail: chatMessage
+                            }));
+                        } catch (e) {
+                            console.error('Erro ao salvar mensagem:', e);
+                        }
+                    }
+
+                    // Garantir que os dados foram salvos antes de redirecionar
+                    debugLog('✅ Checklist salvo com sucesso!');
+                    debugLog('🆔 ID do Checklist:', checklistData.id);
+                }
+
+                // Mostrar mensagem de sucesso
+                if (hasProblems) {
+                    showAlert('error', `⚠️ ALERTA GERADO! ${problemas.length} problema(s) identificado(s). Redirecionando para o Admin...`);
+                    // Notificar admin
+                    if (typeof mostrarNotificacao === 'function') {
+                        mostrarNotificacao('error', 'Alerta Gerado',
+                            `${formData.nome_operador} enviou um checklist com ${problemas.length} problema(s)`, {
+                                url: 'cummins-admin.html',
+                                texto: 'Ver Checklist'
+                            }
+                        );
+                    }
+                } else {
+                    showAlert('success', '✅ Checklist enviado com sucesso! Redirecionando para o Admin...');
+                    // Notificar admin
+                    if (typeof mostrarNotificacao === 'function') {
+                        mostrarNotificacao('success', 'Novo Checklist',
+                            `${formData.nome_operador} enviou um checklist conforme`, {
+                                url: 'cummins-admin.html',
+                                texto: 'Ver Checklist'
+                            }
+                        );
+                    }
+                }
+
+                // Notificar operador também
+                if (typeof mostrarNotificacao === 'function') {
+                    mostrarNotificacao('success', 'Checklist Enviado',
+                        'Seu checklist foi enviado com sucesso!',
+                        null
+                    );
+                }
+
+                // Limpar dados salvos do formulário
+                localStorage.removeItem('cummins_form_data');
+                localStorage.removeItem('cummins_mensagem_admin');
+
+                // Garantir que os dados foram salvos
+                const verifyChecklists = localStorage.getItem('cummins_checklists');
+                if (verifyChecklists) {
+                    const verify = JSON.parse(verifyChecklists);
+                    debugLog('✅ Verificação: Checklists salvos:', verify.length);
+                }
+
+                // Redirecionar para o Dashboard do Operador
+                setTimeout(() => {
+                    window.location.href = 'cummins-operador.html';
+                }, 1500);
+
+            } catch (error) {
+                console.error('Erro ao enviar checklist:', error);
+                showAlert('error', `❌ Erro ao enviar: ${error.message}`);
+                btn.disabled = false;
+                btn.textContent = '✓ ENVIAR CHECKLIST';
+            }
+        }
+
+        // Mostrar alerta
+        function showAlert(type, message) {
+            const successAlert = document.getElementById('alertSuccess');
+            const errorAlert = document.getElementById('alertError');
+            const alertMsg = document.getElementById('alertMessage');
+
+            if (type === 'success') {
+                successAlert.classList.remove('hidden');
+                errorAlert.classList.add('hidden');
+            } else {
+                errorAlert.classList.remove('hidden');
+                successAlert.classList.add('hidden');
+                alertMsg.textContent = message;
+            }
+
+            // Scroll para o topo
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Recuperar dados quando a página ganha foco (volta da câmera)
+        window.addEventListener('focus', () => {
+            loadFromLocalStorage();
+            populateForm();
+            renderPhotos();
+            updatePhotoCount();
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                loadFromLocalStorage();
+                populateForm();
+                renderPhotos();
+                updatePhotoCount();
+            }
+        });
+
+        // Verificar perfil e ajustar menu de navegação
+        function setupNavigation() {
+            const authData = localStorage.getItem('cummins_auth');
+            const navMenu = document.getElementById('navMenu');
+
+            if (authData) {
+                try {
+                    const auth = JSON.parse(authData);
+                    if (auth.isAdmin) {
+                        // Se for admin, adicionar link para admin
+                        navMenu.innerHTML = `
+                            <a href="cummins-dashboard.html" class="nav-link">📊 Dashboard</a>
+                            <a href="cummins-checklist.html" class="nav-link active">📝 Checklist</a>
+                            <a href="cummins-admin.html" class="nav-link">⚙️ Admin</a>
+                        `;
+                    } else {
+                        // Operador vê apenas seu dashboard e checklist
+                        navMenu.innerHTML = `
+                            <a href="cummins-operador.html" class="nav-link">📊 Meu Dashboard</a>
+                            <a href="cummins-checklist.html" class="nav-link active">📝 Checklist</a>
+                        `;
+                    }
+                } catch (e) {
+                    console.error('Erro ao verificar perfil');
+                }
+            }
+        }
+
+        // Inicializar quando a página carregar
+        setupNavigation();
+
+        // Garantir que o DOM está completamente carregado
+        function startInit() {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function() {
+                    setTimeout(init, 200); // Delay para garantir que tudo está pronto
+                });
+            } else {
+                setTimeout(init, 200); // Delay para garantir que tudo está pronto
+            }
+        }
+
+        startInit();
+    </script>
+</body>
+
+</html>

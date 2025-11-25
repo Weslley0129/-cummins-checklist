@@ -1,0 +1,51 @@
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Arquivos de configuração local
+.env
+.env.local
+*.log
+
+# Banco de dados local
+*.db
+*.sqlite
+*.sqlite3
+cummins.db
+
+# Arquivos temporários
+*.tmp
+*.temp
+*~
+
+# Node modules (se usar npm)
+node_modules/
+package-lock.json
+
+# Arquivos de IDE e extensões
+.vscode/
+.idea/
+*.swp
+*.swo
+extensions/
+ide_state.json
+
+# Arquivos de backup
+*.bak
+*.backup
+
+# Arquivos de teste temporários
+test-*.html
+script_temp.txt
+
+# Outros projetos (não CUMMINS)
+zenbotanic-site/
+relogio-digital.html
+servidor-*.py
+servidor-*.ps1
+hospedar-netlify.bat
+publicar-*.bat
+iniciar-servidor*.bat
+iniciar-servidor*.ps1
+
