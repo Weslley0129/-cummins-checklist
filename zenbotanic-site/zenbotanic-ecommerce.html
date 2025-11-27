@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="ZenBotanic - E-commerce de plantas exóticas. Traga a natureza para dentro da sua casa.">
+    <meta name="theme-color" content="#2e7d32">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>ZenBotanic - E-commerce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Ícones (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <!-- Fonte Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f0f7f4 0%, #e8f5e9 50%, #f1f8e9 100%);
+            background-attachment: fixed;
+        }
+        /* Textura de folhas no background */
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 20% 30%, rgba(76, 175, 80, 0.03) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(139, 195, 74, 0.03) 0%, transparent 50%), radial-gradient(circle at 40% 80%, rgba(104, 159, 56, 0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Playfair Display', serif;
+        }
+        /* --- CARDS ORGÂNICOS COM FLIP 3D --- */
+        
+        .flip-card {
+            background-color: transparent;
+            height: 420px;
+            perspective: 1000px;
+        }
+        
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            border-radius: 2rem;
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.1), 0 4px 8px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+        
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+            box-shadow: 0 20px 40px rgba(76, 175, 80, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .flip-card-front,
+        .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 2rem;
+            overflow: hidden;
+        }
+        
+        .flip-card-front {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fdf9 100%);
+            color: black;
+            border: 2px solid rgba(76, 175, 80, 0.1);
+        }
+        
+        .flip-card-front::before {
+            content: '🌿';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 120px;
+            opacity: 0.05;
+            transform: rotate(15deg);
+            pointer-events: none;
+        }
+        
+        .flip-card-back {
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 50%, #2e7d32 100%);
+            color: white;
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.2);
+        }
+        
+        .flip-card-back::after {
+            content: '🍃';
+            position: absolute;
+            bottom: -30px;
+            left: -30px;
+            font-size: 100px;
+            opacity: 0.1;
+            transform: rotate(-15deg);
+            pointer-events: none;
+        }
+        /* Botões orgânicos */
+        
+        .btn-comprar {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+        }
+        
+        .btn-comprar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+            background: linear-gradient(135deg, #f8fdf9 0%, #ffffff 100%);
+        }
+        
+        .btn-comprar:active {
+            transform: translateY(0) scale(0.98);
+        }
+        /* Animação de folhas flutuantes */
+        
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-10px) rotate(5deg);
+            }
+        }
+        
+        @keyframes grow {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        /* Toast Notification Animation */
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .toast-enter {
+            animation: slideIn 0.5s forwards;
+        }
+        /* Header natural */
+        
+        header {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 253, 249, 0.9) 100%);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(76, 175, 80, 0.1);
+        }
+        /* Hero section natural */
+        
+        .hero-section {
+            background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #388e3c 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.3;
+        }
+        /* Modal Styles */
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(27, 94, 32, 0.4);
+            backdrop-filter: blur(8px);
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fdf9 100%);
+            border-radius: 2rem;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(27, 94, 32, 0.2), 0 0 0 2px rgba(76, 175, 80, 0.1);
+            animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid rgba(76, 175, 80, 0.2);
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px) scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+        /* Botão flutuante mobile */
+        
+        .mobile-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 999;
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(46, 125, 50, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .mobile-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(46, 125, 50, 0.5);
+        }
+        
+        .mobile-button:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-button {
+                display: none;
+                /* Oculta em dispositivos móveis reais */
+            }
+        }
+        /* Mostrar apenas em desktop */
+        
+        @media (min-width: 769px) {
+            .mobile-button {
+                display: flex;
+            }
+        }
+        /* Animação de pulso */
+        
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+        
+        .mobile-button .pulse-icon {
+            animation: pulse 2s infinite;
+        }
+        /* QR Code Modal */
+        
+        .qr-code-container {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .qr-code-image {
+            width: 250px;
+            height: 250px;
+            margin: 20px auto;
+            border: 4px solid #2e7d32;
+            border-radius: 15px;
+            padding: 10px;
+            background: white;
+        }
+        
+        .mobile-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .mobile-link-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            border-radius: 15px;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .mobile-link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .mobile-link-btn.whatsapp {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        }
+        
+        .mobile-link-btn.sms {
+            background: linear-gradient(135deg, #4CAF50 0%, #2e7d32 100%);
+        }
+        
+        .mobile-link-btn.share {
+            background: linear-gradient(135deg, #388e3c 0%, #1b5e20 100%);
+        }
+        /* Melhorias Mobile */
+        
+        @media (max-width: 768px) {
+            /* Ajustar cards em mobile */
+            .flip-card {
+                height: auto;
+                min-height: 400px;
+            }
+            /* Header mobile */
+            header nav {
+                display: none;
+            }
+            /* Modal mobile */
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+                max-height: 95vh;
+            }
+            /* QR Code mobile */
+            .qr-code-image {
+                width: 200px;
+                height: 200px;
+            }
+            /* Botões mobile */
+            .mobile-link-btn {
+                font-size: 14px;
+                padding: 12px;
+            }
+            /* Toast mobile */
+            #toast {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                width: auto;
+            }
+        }
+        /* Detecção de touch */
+        
+        @media (hover: none) and (pointer: coarse) {
+            /* Dispositivo touch - melhorar área de toque */
+            .btn-comprar,
+            .mobile-link-btn,
+            button {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+        /* PWA - Instalar como app */
+        
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .install-prompt.show {
+            display: flex;
+        }
+        /* Input de cartão com ícones */
+        
+        .card-input {
+            position: relative;
+        }
+        
+        .card-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+        }
+        /* Estilos para Tema Escuro */
+        
+        body.tema-escuro {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        
+        body.tema-escuro header {
+            background: linear-gradient(180deg, rgba(26, 26, 26, 0.95) 0%, rgba(30, 30, 30, 0.9) 100%);
+            border-bottom: 2px solid rgba(76, 175, 80, 0.3);
+        }
+        
+        body.tema-escuro .hero-section {
+            background: linear-gradient(135deg, #0d2818 0%, #1b5e20 50%, #2e7d32 100%);
+        }
+        
+        body.tema-escuro section {
+            background-color: #1f1f1f;
+        }
+        
+        body.tema-escuro .flip-card-front,
+        body.tema-escuro .flip-card-back {
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+        }
+        
+        body.tema-escuro footer {
+            background: linear-gradient(to right, #0d2818, #1b5e20);
+        }
+        
+        body.tema-escuro .modal-content {
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+        }
+        
+        body.tema-escuro input,
+        body.tema-escuro select,
+        body.tema-escuro textarea {
+            background-color: #3a3a3a;
+            color: #e0e0e0;
+            border-color: #555;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen relative" style="z-index: 1;">
+    <!-- 1. CABEÇALHO SEMÂNTICO (<header>) -->
+    <header class="sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-3">
+                    <span class="text-4xl">🌿</span>
+                    <span class="font-bold text-2xl text-green-800 tracking-tight" style="font-family: 'Playfair Display', serif;">ZenBotanic</span>
+                </div>
+
+                <!-- Menu de Navegação (<nav>) -->
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#" class="text-green-700 hover:text-green-600 px-4 py-2 rounded-full font-medium transition-all hover:bg-green-50">Início</a>
+                    <a href="#produtos" class="text-green-800 bg-green-100 px-4 py-2 rounded-full font-bold transition-all">Plantas</a>
+                    <a href="#" class="text-green-700 hover:text-green-600 px-4 py-2 rounded-full font-medium transition-all hover:bg-green-50">Vasos</a>
+                    <a href="#contato" class="text-green-700 hover:text-green-600 px-4 py-2 rounded-full font-medium transition-all hover:bg-green-50">Contato</a>
+                </nav>
+                <!-- Ações -->
+                <div class="flex items-center gap-3">
+                    <!-- Campo de Pesquisa -->
+                    <div class="relative hidden md:block">
+                        <input type="text" id="campo-pesquisa" placeholder="Buscar plantas..." class="px-4 py-2 pr-10 border border-green-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent w-48">
+                        <button onclick="validarPesquisa()" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-green-600 hover:text-green-700">
+                            <span class="text-xl">🔍</span>
+                        </button>
+                        <div id="mensagem-pesquisa" class="hidden absolute top-full mt-2 left-0 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-lg text-sm z-50"></div>
+                    </div>
+
+                    <!-- Botão Tema Claro/Escuro -->
+                    <button onclick="alternarTema()" id="btn-tema" class="p-2 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-full transition-all" aria-label="Alternar tema">
+                        <span class="text-xl" id="icone-tema">🌙</span>
+                    </button>
+
+                    <button onclick="abrirCarrinho()" class="relative p-2 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-full transition-all" aria-label="Carrinho de compras">
+                        <span class="text-xl">🛒</span>
+                        <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-green-600 rounded-full hidden">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. CONTEÚDO PRINCIPAL (<main>) -->
+    <main class="flex-grow">
+
+        <!-- Seção Hero (<section>) -->
+        <section class="hero-section relative text-white py-24 lg:py-40 overflow-hidden">
+            <div class="absolute inset-0">
+                <img src="https://images.unsplash.com/photo-1463936575829-25148e1db1b8?q=80&w=1920&auto=format&fit=crop" alt="Sala de estar cheia de plantas verdes" class="w-full h-full object-cover opacity-30">
+            </div>
+            <div class="relative max-w-7xl mx-auto px-4 text-center z-10">
+                <div class="inline-block mb-4 text-6xl animate-bounce" style="animation-duration: 3s;">🌿</div>
+                <h1 class="text-5xl md:text-7xl font-bold mb-6 drop-shadow-2xl text-white" style="text-shadow: 0 4px 20px rgba(0,0,0,0.3);">Traga a natureza para dentro</h1>
+                <p class="text-xl md:text-2xl mb-10 text-green-50 max-w-2xl mx-auto leading-relaxed">Plantas exóticas selecionadas para purificar seu ar e acalmar sua mente.</p>
+                <a href="#produtos" class="inline-block bg-white text-green-800 hover:bg-green-50 font-bold py-4 px-10 rounded-full transition-all transform hover:scale-105 shadow-2xl hover:shadow-green-900/30 text-lg">
+                    🌱 Ver Coleção
+                </a>
+            </div>
+            <!-- Decoração de folhas -->
+            <div class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-transparent to-transparent" style="background: linear-gradient(to top, rgba(240, 247, 244, 0.5), transparent);"></div>
+        </section>
+
+        <!-- Seção de Produtos (<section>) -->
+        <section id="produtos" class="max-w-7xl mx-auto px-4 py-20 relative">
+            <div class="text-center mb-16">
+                <div class="inline-block text-4xl mb-4">🌳</div>
+                <h2 class="text-4xl md:text-5xl font-bold text-green-900 mb-6">Destaques da Semana</h2>
+                <div class="flex items-center justify-center gap-2">
+                    <div class="w-16 h-1 bg-gradient-to-r from-transparent to-green-500 rounded-full"></div>
+                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <div class="w-16 h-1 bg-gradient-to-l from-transparent to-green-500 rounded-full"></div>
+                </div>
+            </div>
+
+            <!-- Seção de Produtos da API -->
+            <div class="mb-12">
+                <h3 class="text-2xl md:text-3xl font-bold text-green-800 mb-6 text-center">
+                    🌐 Produtos em Destaque (API)
+                </h3>
+                <p class="text-center text-stone-600 mb-8">Produtos carregados dinamicamente da Fake Store API</p>
+                <div id="container-produtos-api" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Produtos da API serão inseridos aqui dinamicamente -->
+                </div>
+            </div>
+
+            <!-- Separador -->
+            <div class="text-center my-12">
+                <div class="inline-block w-32 h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent"></div>
+            </div>
+
+            <!-- Produtos Estáticos (Manter os existentes) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- PRODUTO 1: Monstera (Flip Card) -->
+                <article class="flip-card group cursor-pointer" tabindex="0">
+                    <div class="flip-card-inner">
+                        <!-- FRENTE -->
+                        <div class="flip-card-front shadow-lg flex flex-col">
+                            <div class="h-64 overflow-hidden bg-stone-100">
+                                <img src="https://images.unsplash.com/photo-1614594975525-e45852b8a0b5?w=500&auto=format&fit=crop" alt="Planta Monstera Deliciosa em vaso branco" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                            </div>
+                            <div class="p-6 flex-grow flex flex-col justify-between text-left">
+                                <div>
+                                    <span class="text-xs font-bold text-green-600 uppercase tracking-wider">Mais vendida</span>
+                                    <h3 class="text-xl font-bold text-stone-900 mt-1">Monstera Deliciosa</h3>
+                                    <p class="text-stone-500 text-sm mt-2">A famosa costela-de-adão, perfeita para ambientes internos.</p>
+                                </div>
+                                <div class="mt-4 text-2xl font-bold text-green-700">R$ 89,90</div>
+                            </div>
+                        </div>
+                        <!-- VERSO -->
+                        <div class="flip-card-back shadow-xl">
+                            <i class="ph ph-sun text-4xl mb-2 text-yellow-300"></i>
+                            <h4 class="font-bold text-xl mb-2">Cuidados</h4>
+                            <p class="text-sm text-center mb-6 px-4 text-green-100">Gosta de luz indireta e rega moderada. Mantenha o solo levemente úmido.</p>
+
+                            <div class="flex gap-2 mb-6">
+                                <span class="px-2 py-1 bg-green-700 rounded text-xs">Purificadora</span>
+                                <span class="px-2 py-1 bg-green-700 rounded text-xs">Pet-Friendly: Não</span>
+                            </div>
+                            <button onclick="adicionarAoCarrinho('Monstera Deliciosa', 89.90)" class="btn-comprar bg-white text-green-900 hover:bg-stone-100 font-bold py-3 px-8 rounded-full shadow-md flex items-center gap-2">
+                                <i class="ph ph-shopping-bag"></i>
+                                Adicionar ao Carrinho
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- PRODUTO 2: Zamioculca (Flip Card) -->
+                <article class="flip-card group cursor-pointer" tabindex="0">
+                    <div class="flip-card-inner">
+                        <!-- FRENTE -->
+                        <div class="flip-card-front shadow-lg flex flex-col">
+                            <div class="h-64 overflow-hidden bg-stone-100">
+                                <img src="https://images.unsplash.com/photo-1632207691143-643e2a9a9361?w=500&auto=format&fit=crop" alt="Planta Zamioculca em vaso de barro" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                            </div>
+                            <div class="p-6 flex-grow flex flex-col justify-between text-left">
+                                <div>
+                                    <span class="text-xs font-bold text-green-600 uppercase tracking-wider">Resistente</span>
+                                    <h3 class="text-xl font-bold text-stone-900 mt-1">Zamioculca</h3>
+                                    <p class="text-stone-500 text-sm mt-2">Indestrutível e elegante. Ideal para quem esquece de regar.</p>
+                                </div>
+                                <div class="mt-4 text-2xl font-bold text-green-800">R$ 55,00</div>
+                            </div>
+                        </div>
+                        <!-- VERSO -->
+                        <div class="flip-card-back shadow-xl">
+                            <i class="ph ph-drop text-4xl mb-2 text-blue-300"></i>
+                            <h4 class="font-bold text-xl mb-2">Cuidados</h4>
+                            <p class="text-sm text-center mb-6 px-4 text-green-100">Pouquíssima água. Sobrevive bem em ambientes com pouca luz.</p>
+
+                            <div class="flex gap-2 mb-6">
+                                <span class="px-2 py-1 bg-green-700 rounded text-xs">Baixa Manutenção</span>
+                                <span class="px-2 py-1 bg-green-700 rounded text-xs">Sombra</span>
+                            </div>
+                            <button onclick="adicionarAoCarrinho('Zamioculca', 55.00)" class="btn-comprar bg-white text-green-900 hover:bg-stone-100 font-bold py-3 px-8 rounded-full shadow-md flex items-center gap-2">
+                                <i class="ph ph-shopping-bag"></i>
+                                Adicionar ao Carrinho
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- PRODUTO 3: Ficus Lyrata (Flip Card) -->
+                <article class="flip-card group cursor-pointer" tabindex="0">
+                    <div class="flip-card-inner">
+                        <!-- FRENTE -->
+                        <div class="flip-card-front shadow-lg flex flex-col">
+                            <div class="h-64 overflow-hidden bg-stone-100">
+                                <img src="https://images.unsplash.com/photo-1597054904538-9f3a4926f475?w=500&auto=format&fit=crop" alt="Ficus Lyrata grande em sala iluminada" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                            </div>
+                            <div class="p-6 flex-grow flex flex-col justify-between text-left">
+                                <div>
+                                    <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">Premium</span>
+                                    <h3 class="text-xl font-bold text-stone-900 mt-1">Ficus Lyrata</h3>
+                                    <p class="text-stone-500 text-sm mt-2">A árvore violino. Folhas largas e presença marcante.</p>
+                                </div>
+                                <div class="mt-4 text-2xl font-bold text-green-800">R$ 149,90</div>
+                            </div>
+                        </div>
+                        <!-- VERSO -->
+                        <div class="flip-card-back shadow-xl">
+                            <i class="ph ph-sun-dim text-4xl mb-2 text-yellow-300"></i>
+                            <h4 class="font-bold text-xl mb-2">Cuidados</h4>
+                            <p class="text-sm text-center mb-6 px-4 text-green-100">Precisa de muita luz indireta. Limpe as folhas regularmente.</p>
+
+                            <div class="flex gap-2 mb-6">
+                                <span class="px-2 py-1 bg-green-700 rounded text-xs">Statement Piece</span>
+                                <span class="px-2 py-1 bg-green-700 rounded text-xs">Pet-Friendly: Não</span>
+                            </div>
+                            <button onclick="adicionarAoCarrinho('Ficus Lyrata', 149.90)" class="btn-comprar bg-white text-green-900 hover:bg-stone-100 font-bold py-3 px-8 rounded-full shadow-md flex items-center gap-2">
+                                <i class="ph ph-shopping-bag"></i>
+                                Adicionar ao Carrinho
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- PRODUTO 4: Coleção Jardim Exterior (Flip Card) -->
+                <article class="flip-card group cursor-pointer" tabindex="0">
+                    <div class="flip-card-inner">
+                        <!-- FRENTE -->
+                        <div class="flip-card-front shadow-lg flex flex-col">
+                            <div class="h-64 overflow-hidden bg-stone-100">
+                                <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=500&auto=format&fit=crop" alt="Coleção de plantas em vasos de cerâmica vermelha" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                            </div>
+                            <div class="p-6 flex-grow flex flex-col justify-between text-left">
+                                <div>
+                                    <span class="text-xs font-bold text-red-600 uppercase tracking-wider">Coleção</span>
+                                    <h3 class="text-xl font-bold text-stone-900 mt-1">Coleção Jardim Exterior</h3>
+                                    <p class="text-stone-500 text-sm mt-2">Conjunto de 3 plantas em vasos de cerâmica artesanal para jardim.</p>
+                                </div>
+                                <div class="mt-4 text-2xl font-bold text-green-800">R$ 199,90</div>
+                            </div>
+                        </div>
+                        <!-- VERSO -->
+                        <div class="flip-card-back shadow-xl">
+                            <i class="ph ph-tree text-4xl mb-2 text-yellow-300"></i>
+                            <h4 class="font-bold text-xl mb-2">Cuidados</h4>
+                            <p class="text-sm text-center mb-6 px-4 text-green-100">Ideal para áreas externas. Regar regularmente e manter em local com boa iluminação.</p>
+
+                            <div class="flex gap-2 mb-6">
+                                <span class="px-2 py-1 bg-green-700 rounded text-xs">Exterior</span>
+                                <span class="px-2 py-1 bg-green-700 rounded text-xs">Vaso Incluído</span>
+                            </div>
+                            <button onclick="adicionarAoCarrinho('Coleção Jardim Exterior', 199.90)" class="btn-comprar bg-white text-green-900 hover:bg-stone-100 font-bold py-3 px-8 rounded-full shadow-md flex items-center gap-2">
+                                <i class="ph ph-shopping-bag"></i>
+                                Adicionar ao Carrinho
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- PRODUTO 5: Croton Colorido (Flip Card) -->
+                <article class="flip-card group cursor-pointer" tabindex="0">
+                    <div class="flip-card-inner">
+                        <!-- FRENTE -->
+                        <div class="flip-card-front shadow-lg flex flex-col">
+                            <div class="h-64 overflow-hidden bg-stone-100">
+                                <img src="https://images.unsplash.com/photo-1593691509542-0b77a3e5b0d3?w=500&auto=format&fit=crop" alt="Croton com folhas coloridas em vaso escuro" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                            </div>
+                            <div class="p-6 flex-grow flex flex-col justify-between text-left">
+                                <div>
+                                    <span class="text-xs font-bold text-orange-600 uppercase tracking-wider">Colorida</span>
+                                    <h3 class="text-xl font-bold text-stone-900 mt-1">Croton Colorido</h3>
+                                    <p class="text-stone-500 text-sm mt-2">Folhas vibrantes em tons de vermelho, laranja e amarelo. Destaque único!</p>
+                                </div>
+                                <div class="mt-4 text-2xl font-bold text-green-800">R$ 75,00</div>
+                            </div>
+                        </div>
+                        <!-- VERSO -->
+                        <div class="flip-card-back shadow-xl">
+                            <i class="ph ph-palette text-4xl mb-2 text-orange-300"></i>
+                            <h4 class="font-bold text-xl mb-2">Cuidados</h4>
+                            <p class="text-sm text-center mb-6 px-4 text-green-100">Gosta de luz intensa indireta. Mantenha solo úmido e ambiente quente.</p>
+
+                            <div class="flex gap-2 mb-6">
+                                <span class="px-2 py-1 bg-green-700 rounded text-xs">Colorida</span>
+                                <span class="px-2 py-1 bg-green-700 rounded text-xs">Pet-Friendly: Não</span>
+                            </div>
+                            <button onclick="adicionarAoCarrinho('Croton Colorido', 75.00)" class="btn-comprar bg-white text-green-900 hover:bg-stone-100 font-bold py-3 px-8 rounded-full shadow-md flex items-center gap-2">
+                                <i class="ph ph-shopping-bag"></i>
+                                Adicionar ao Carrinho
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- PRODUTO 6: Coleção Minimalista Zen (Flip Card) -->
+                <article class="flip-card group cursor-pointer" tabindex="0">
+                    <div class="flip-card-inner">
+                        <!-- FRENTE -->
+                        <div class="flip-card-front shadow-lg flex flex-col">
+                            <div class="h-64 overflow-hidden bg-stone-100">
+                                <img src="https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=500&auto=format&fit=crop" alt="Coleção de plantas em vasos quadrados minimalistas" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                            </div>
+                            <div class="p-6 flex-grow flex flex-col justify-between text-left">
+                                <div>
+                                    <span class="text-xs font-bold text-purple-600 uppercase tracking-wider">Minimalista</span>
+                                    <h3 class="text-xl font-bold text-stone-900 mt-1">Coleção Minimalista Zen</h3>
+                                    <p class="text-stone-500 text-sm mt-2">Trio de plantas em vasos quadrados com textura artesanal. Estilo moderno.</p>
+                                </div>
+                                <div class="mt-4 text-2xl font-bold text-green-800">R$ 249,90</div>
+                            </div>
+                        </div>
+                        <!-- VERSO -->
+                        <div class="flip-card-back shadow-xl">
+                            <i class="ph ph-yin-yang text-4xl mb-2 text-yellow-300"></i>
+                            <h4 class="font-bold text-xl mb-2">Cuidados</h4>
+                            <p class="text-sm text-center mb-6 px-4 text-green-100">Inclui Peace Lily, Calathea e ZZ Plant. Cuidados diferenciados para cada espécie.</p>
+
+                            <div class="flex gap-2 mb-6">
+                                <span class="px-2 py-1 bg-green-700 rounded text-xs">3 Plantas</span>
+                                <span class="px-2 py-1 bg-green-700 rounded text-xs">Vaso Incluído</span>
+                            </div>
+                            <button onclick="adicionarAoCarrinho('Coleção Minimalista Zen', 249.90)" class="btn-comprar bg-white text-green-900 hover:bg-stone-100 font-bold py-3 px-8 rounded-full shadow-md flex items-center gap-2">
+                                <i class="ph ph-shopping-bag"></i>
+                                Adicionar ao Carrinho
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Seção de Contato -->
+        <section id="contato" class="max-w-7xl mx-auto px-4 py-20 relative">
+            <div class="text-center mb-12">
+                <div class="inline-block text-4xl mb-4">💚</div>
+                <h2 class="text-4xl md:text-5xl font-bold text-green-900 mb-6">Entre em Contato</h2>
+                <div class="flex items-center justify-center gap-2">
+                    <div class="w-16 h-1 bg-gradient-to-r from-transparent to-green-500 rounded-full"></div>
+                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <div class="w-16 h-1 bg-gradient-to-l from-transparent to-green-500 rounded-full"></div>
+                </div>
+            </div>
+            <div class="max-w-2xl mx-auto bg-gradient-to-br from-white to-green-50 rounded-3xl shadow-2xl p-10 border-2 border-green-100">
+                <div class="flex flex-col md:flex-row items-center justify-center gap-8 mb-8">
+                    <div class="flex items-center gap-3 bg-white/50 p-4 rounded-2xl border-2 border-green-100">
+                        <span class="text-4xl">📞</span>
+                        <div>
+                            <p class="text-sm text-green-600 font-medium">Telefone</p>
+                            <p class="font-bold text-lg text-green-800">(11) 98765-4321</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 bg-white/50 p-4 rounded-2xl border-2 border-green-100">
+                        <span class="text-4xl">✉️</span>
+                        <div>
+                            <p class="text-sm text-green-600 font-medium">E-mail</p>
+                            <p class="font-bold text-lg text-green-800">contato@zenbotanic.com.br</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-t-2 border-green-200 pt-8">
+                    <h3 class="text-2xl font-bold text-center mb-6 text-green-900" style="font-family: 'Playfair Display', serif;">Siga-nos nas Redes Sociais</h3>
+                    <div class="flex justify-center gap-4 flex-wrap">
+                        <a href="#" class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full hover:scale-110 transition-all shadow-lg hover:shadow-xl" aria-label="Instagram">
+                            <span class="text-xl">📷</span>
+                            <span class="font-medium">@zenbotanic</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full hover:scale-110 transition-all shadow-lg hover:shadow-xl" aria-label="Facebook">
+                            <span class="text-xl">👥</span>
+                            <span class="font-medium">ZenBotanic</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-full hover:scale-110 transition-all shadow-lg hover:shadow-xl" aria-label="TikTok">
+                            <span class="text-xl">🎵</span>
+                            <span class="font-medium">@zenbotanic</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Rodapé com Data e Hora -->
+    <footer class="bg-gradient-to-r from-green-800 to-green-900 text-white py-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-sm mb-2">© 2024 ZenBotanic - Todos os direitos reservados</p>
+            <p id="data-hora" class="text-xs text-green-200">Carregando data e hora...</p>
+            <p id="contador-cliques" class="text-xs text-green-200 mt-2 hidden">Total de cliques em compras: <span id="numero-cliques">0</span></p>
+        </div>
+    </footer>
+
+    <!-- 3. RODAPÉ SEMÂNTICO (<footer>) -->
+    <footer class="bg-gradient-to-b from-green-900 via-green-800 to-green-900 text-green-100 py-16 mt-12 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
+            <div>
+                <div class="flex items-center gap-3 mb-4 text-white">
+                    <span class="text-3xl">🌿</span>
+                    <span class="font-bold text-2xl" style="font-family: 'Playfair Display', serif;">ZenBotanic</span>
+                </div>
+                <p class="text-sm mb-4 text-green-100 leading-relaxed">Levando vida e cor para sua casa desde 2023. 🌱</p>
+                <div class="flex items-center gap-2 text-sm text-green-200">
+                    <span class="text-lg">📞</span>
+                    <span>(11) 98765-4321</span>
+                </div>
+            </div>
+            <div>
+                <h5 class="text-white font-bold mb-4 text-lg" style="font-family: 'Playfair Display', serif;">Ajuda</h5>
+                <ul class="space-y-3 text-sm">
+                    <li><a href="#" class="hover:text-green-300 transition-colors flex items-center gap-2"><span>🌿</span> Entregas</a></li>
+                    <li><a href="#" class="hover:text-green-300 transition-colors flex items-center gap-2"><span>🌿</span> Devoluções</a></li>
+                    <li><a href="#" class="hover:text-green-300 transition-colors flex items-center gap-2"><span>🌿</span> Guia de Cuidados</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="text-white font-bold mb-4 text-lg" style="font-family: 'Playfair Display', serif;">Pagamento Seguro</h5>
+                <div class="flex gap-4 text-3xl mb-4">
+                    <span>💳</span>
+                    <span>💵</span>
+                    <span>📱</span>
+                </div>
+                <p class="text-xs text-green-200">&copy; 2025 ZenBotanic Ltda. Todos os direitos reservados. 🌳</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal do Carrinho -->
+    <div id="modal-carrinho" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-stone-800 flex items-center gap-2">
+                    <i class="ph ph-shopping-cart text-green-700"></i> Carrinho de Compras
+                </h2>
+                <button onclick="fecharCarrinho()" class="text-stone-400 hover:text-stone-600 text-2xl">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+
+            <div id="carrinho-itens" class="mb-6 max-h-96 overflow-y-auto">
+                <!-- Itens do carrinho serão inseridos aqui -->
+            </div>
+
+            <div class="border-t border-stone-200 pt-4 mb-4">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xl font-bold text-stone-800">Total:</span>
+                    <span id="carrinho-total" class="text-2xl font-bold text-green-700">R$ 0,00</span>
+                </div>
+                <button onclick="abrirPagamento()" id="btn-finalizar" class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-4 px-6 rounded-full transition-all transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    disabled>
+                    🌿 Finalizar Compra
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Pagamento -->
+    <div id="modal-pagamento" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-stone-800 flex items-center gap-2">
+                    <i class="ph ph-credit-card text-green-700"></i> Pagamento
+                </h2>
+                <button onclick="fecharPagamento()" class="text-stone-400 hover:text-stone-600 text-2xl">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+
+            <form id="form-pagamento" onsubmit="processarPagamento(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-stone-700 mb-2">Tipo de Cartão</label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="tipo-cartao" value="credito" checked class="text-green-600">
+                            <span>Crédito</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="tipo-cartao" value="debito" class="text-green-600">
+                            <span>Débito</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-stone-700 mb-2">Número do Cartão</label>
+                    <div class="card-input">
+                        <input type="text" id="numero-cartao" placeholder="0000 0000 0000 0000" maxlength="19" class="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
+                        <i class="ph ph-credit-card card-icon text-stone-400"></i>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-2">Validade</label>
+                        <input type="text" id="validade" placeholder="MM/AA" maxlength="5" class="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-2">CVV</label>
+                        <input type="text" id="cvv" placeholder="123" maxlength="4" class="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-stone-700 mb-2">Nome no Cartão</label>
+                    <input type="text" id="nome-cartao" placeholder="NOME COMPLETO" class="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent uppercase" required>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-stone-700 mb-2">Parcelas</label>
+                    <select id="parcelas" class="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        <option value="1">1x sem juros</option>
+                        <option value="2">2x sem juros</option>
+                        <option value="3">3x sem juros</option>
+                        <option value="4">4x sem juros</option>
+                        <option value="5">5x sem juros</option>
+                        <option value="6">6x sem juros</option>
+                    </select>
+                </div>
+
+                <div class="bg-stone-50 p-4 rounded-lg mb-6">
+                    <div class="flex justify-between items-center">
+                        <span class="text-stone-600">Total a pagar:</span>
+                        <span id="total-pagamento" class="text-2xl font-bold text-green-700">R$ 0,00</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-4 px-6 rounded-full transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+                    🔒 Confirmar Pagamento
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Botão Flutuante Mobile -->
+    <button onclick="abrirModalMobile()" class="mobile-button" title="Abrir no celular">
+        <span class="pulse-icon">📱</span>
+        <span>Abrir no Celular</span>
+    </button>
+
+    <!-- Modal Mobile/QR Code -->
+    <div id="modal-mobile" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-green-900 flex items-center gap-2" style="font-family: 'Playfair Display', serif;">
+                    <span>📱</span> Acesse pelo Celular
+                </h2>
+                <button onclick="fecharModalMobile()" class="text-stone-400 hover:text-stone-600 text-2xl">
+                    <span>✕</span>
+                </button>
+            </div>
+
+            <div class="qr-code-container">
+                <p class="text-green-700 mb-4 font-medium">Escaneie o QR Code com seu celular:</p>
+                <div class="qr-code-image" id="qr-code-placeholder">
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-radius: 10px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 60px; margin-bottom: 10px;">📱</div>
+                            <div style="font-size: 12px; color: #2e7d32; font-weight: bold;">QR Code</div>
+                            <div style="font-size: 10px; color: #4caf50; margin-top: 5px;">Gerando...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mobile-links">
+                    <!-- Copiar Link/Domínio -->
+                    <button onclick="copiarLinkCompleto()" class="mobile-link-btn share" id="btn-copiar-link">
+                        <span>📋</span>
+                        <span>Copiar Link</span>
+                    </button>
+
+                    <!-- Compartilhar via WhatsApp -->
+                    <button onclick="compartilharWhatsApp()" class="mobile-link-btn whatsapp">
+                        <span>💬</span>
+                        <span>Compartilhar no WhatsApp</span>
+                    </button>
+
+                    <!-- Compartilhar via Sistema -->
+                    <button onclick="compartilharSite()" class="mobile-link-btn share">
+                        <span>🔗</span>
+                        <span>Compartilhar (Sistema)</span>
+                    </button>
+
+                    <!-- Abrir no Celular -->
+                    <button onclick="enviarSMS()" class="mobile-link-btn sms">
+                        <span>📱</span>
+                        <span>Enviar Link por SMS</span>
+                    </button>
+                </div>
+
+                <!-- Link copiado feedback -->
+                <div id="link-copiado-feedback" class="hidden mt-4 p-3 bg-green-100 border-2 border-green-300 rounded-xl">
+                    <p class="text-sm text-green-800 font-bold text-center">✅ Link copiado para área de transferência!</p>
+                </div>
+
+                <!-- Mensagem simples e amigável -->
+                <div class="mt-6 p-4 bg-green-50 rounded-xl border-2 border-green-200">
+                    <p class="text-sm text-green-800 font-medium text-center">
+                        📱 Escaneie o QR Code ou use os botões acima para compartilhar o site!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Banner de Compartilhamento de Domínio (Mobile) -->
+    <div id="banner-compartilhar" class="fixed top-0 left-0 right-0 bg-gradient-to-r from-green-600 to-green-700 text-white p-3 shadow-lg z-40 transform -translate-y-full transition-transform duration-300">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2 flex-1 min-w-0">
+                <span class="text-xl">🔗</span>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-bold truncate" id="banner-url">Compartilhe este link</p>
+                </div>
+            </div>
+            <button onclick="copiarLinkCompleto()" class="bg-white text-green-700 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap">
+                Copiar
+            </button>
+            <button onclick="fecharBannerCompartilhar()" class="text-white text-xl">✕</button>
+        </div>
+    </div>
+
+    <!-- Toast de Notificação (Escondido por padrão) -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-gradient-to-r from-green-800 to-green-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 transform translate-x-[150%] transition-transform duration-300 z-50 border-2 border-green-400">
+        <span class="text-2xl">✅</span>
+        <div>
+            <h4 class="font-bold text-sm">Produto Adicionado!</h4>
+            <p id="toast-message" class="text-xs text-green-100">Monstera foi para o carrinho.</p>
+        </div>
+    </div>
+
+    <!-- Script externo com todas as funcionalidades JavaScript -->
+    <script src="script.js"></script>
+</body>
+
+</html>
